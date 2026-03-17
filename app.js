@@ -10,6 +10,20 @@ function updateTime() {
 setInterval(updateTime, 1000);
 updateTime();
 
+// Refresh Control & Auto-Renewal
+const REFRESH_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
+
+document.getElementById('refresh-btn').addEventListener('click', () => {
+    // Reloads the page to fetch the latest "current time" and renew content
+    location.reload();
+});
+
+// Auto-refresh the dashboard exactly every 30 minutes
+setInterval(() => {
+    console.log("30 minutes passed. Renewing news contents & dashboard data.");
+    location.reload();
+}, REFRESH_INTERVAL_MS);
+
 // Chart Theme Configuration
 Chart.defaults.color = '#8b949e';
 Chart.defaults.font.family = "'Inter', sans-serif";
@@ -20,12 +34,17 @@ const gridConfig = {
 
 // --- DATA DEFINITIONS ---
 
-// 1. Exchange Rate Data (Past 6 Months: Sep 2025 - Mar 2026)
+// 1. Exchange Rate Data Setup
+const todayChart = new Date();
+const todayLabel = todayChart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' (Today)';
+
+// Initial chart data (the last point is a placeholder that will be updated)
+let krwChartInstance = null;
 const krwData = {
-    labels: ['Sep 25', 'Oct 25', 'Nov 25', 'Dec 25', 'Jan 26', 'Feb 26', 'Mar 26'],
+    labels: ['Sep 25', 'Oct 25', 'Nov 25', 'Dec 25', 'Jan 26', 'Feb 26', todayLabel],
     datasets: [{
         label: 'USD to KRW',
-        data: [1379, 1420, 1475, 1470, 1450, 1465, 1503],
+        data: [1379, 1420, 1475, 1470, 1450, 1465, 1488], // Default fallback
         borderColor: '#00d200', /* Green-1 */
         backgroundColor: 'rgba(0, 210, 0, 0.1)',
         borderWidth: 2,
@@ -36,6 +55,42 @@ const krwData = {
         pointHoverRadius: 6
     }]
 };
+
+// Function to fetch real-time USD/KRW exchange rate
+async function fetchRealExchangeRate() {
+    try {
+        // Using Frankfurter API (Free, no key needed for basic usage, supports USD/KRW)
+        // Note: Free APIs might have latency or limit pairs, fallback is 1488 (Current user context)
+        const response = await fetch('https://api.frankfurter.dev/v1/latest?base=USD&symbols=KRW');
+        const data = await response.json();
+        
+        if (data && data.rates && data.rates.KRW) {
+            const currentRate = Math.round(data.rates.KRW);
+            updateExchangeRateUI(currentRate);
+        } else {
+            throw new Error("Invalid API Response");
+        }
+    } catch (error) {
+        console.warn("Could not fetch live exchange rate. Using fallback.", error);
+        // Fallback to the latest known accurate rate (1488 KRW)
+        updateExchangeRateUI(1488);
+    }
+}
+
+function updateExchangeRateUI(rate) {
+    // 1. Update the subtitle
+    const subtitleEl = document.getElementById('exchange-rate-subtitle');
+    if (subtitleEl) {
+        subtitleEl.innerText = `Current Rate: ${rate.toLocaleString()} KRW (Today)`;
+    }
+
+    // 2. Update the chart's last data point
+    if (krwChartInstance) {
+        const dataArray = krwChartInstance.data.datasets[0].data;
+        dataArray[dataArray.length - 1] = rate; // Update the last item
+        krwChartInstance.update();
+    }
+}
 
 // 2. Crane Price Trends (STS, RTGC, DTQC)
 // Prices estimated per unit in Million USD.
@@ -97,7 +152,7 @@ const steelData = {
 window.onload = function() {
     
     // Exchange Rate Chart
-    new Chart(document.getElementById('exchangeRateChart').getContext('2d'), {
+    krwChartInstance = new Chart(document.getElementById('exchangeRateChart').getContext('2d'), {
         type: 'line',
         data: krwData,
         options: {
@@ -157,4 +212,7 @@ window.onload = function() {
             }
         }
     });
+
+    // Fetch dynamic exchange data immediately on load
+    fetchRealExchangeRate();
 };

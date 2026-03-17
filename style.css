@@ -68,6 +68,7 @@ body {
     font-weight: 700;
     background: linear-gradient(90deg, #fff, var(--text-muted));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 0.3rem; 
 }
@@ -87,6 +88,35 @@ body {
     border: 1px solid rgba(129, 209, 121, 0.3);
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
+}
+
+.header-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.8rem;
+}
+
+.refresh-btn {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+    border: 1px solid var(--panel-border);
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.refresh-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
 }
 
 /* Grid Layout */
@@ -225,6 +255,23 @@ body {
     position: relative;
     height: 300px;
     width: 100%;
+}
+
+.chart-source {
+    text-align: right;
+    margin-top: 0.8rem;
+}
+
+.chart-source a {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.chart-source a:hover {
+    color: var(--color-light-green);
+    text-decoration: underline;
 }
 
 /* Tariff Table */
