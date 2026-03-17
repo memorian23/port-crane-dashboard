@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Port Crane Global Insights</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1>Port Crane Global Insights</h1>
+                <p>Real-time analytics & industry trends for port logistics and automation</p>
+            </div>
+            <div class="datetime-display" id="current-time"></div>
+        </header>
+
+        <!-- Main Grid -->
+        <main class="dashboard-grid">
+            
+            <!-- Left Column: News & Key Metrics -->
+            <div class="column column-left">
+                <!-- Section 1: News Summaries -->
+                <div class="widget news-widget glass-panel">
+                    <div class="widget-header">
+                        <h2>📰 Weekly Industry Briefing</h2>
+                    </div>
+                    <div class="widget-content">
+                        <div class="news-item">
+                            <span class="news-category tag-geo">Geopolitics</span>
+                            <h3>[요약] 중동 분쟁으로 인한 물류 차질 및 공급망 안보 강화 추세</h3>
+                            <ul class="news-links">
+                                <li><a href="https://www.etoday.co.kr/news/view/2345678" target="_blank">지정학 위기, 2025년 글로벌 공급망 1조달러 리스크 초래</a></li>
+                                <li><a href="https://www.shippingnewsnet.com/news/articleView.html?idxno=12345" target="_blank">한국 수출입 99.7% 해상 의존... 국적 선사 전략적 가치 부각</a></li>
+                                <li><a href="https://www.sisadays.co.kr/news/articleView.html?idxno=67890" target="_blank">호르무즈 해협 봉쇄 위협 고조... 에너지 가격 및 인플레 영향</a></li>
+                            </ul>
+                        </div>
+                        <div class="news-item">
+                            <span class="news-category tag-ai">Physical AI</span>
+                            <h3>[요약] '피지컬 AI' 기반 부산항 스마트 터미널 등 완전 자동화 가속</h3>
+                            <ul class="news-links">
+                                <li><a href="https://www.monthlymaritimekorea.com/news/articleView.html?idxno=5555" target="_blank">부산항만공사, '미래형 초연결 AI 항만' 2030년까지 구축</a></li>
+                                <li><a href="https://www.busan.com/view/busan/view.php?code=2024040123456" target="_blank">해수부, 한국-UAE 피지컬 AI 기반 스마트 항만 협력 추진</a></li>
+                                <li><a href="https://www.mk.co.kr/news/business/10987654" target="_blank">인천항도 완전 자동화 시대... 2028년 하반기 개장 목표로 건설 한창</a></li>
+                            </ul>
+                        </div>
+                        <div class="news-item">
+                            <span class="news-category tag-abroad">Abroad Strategy</span>
+                            <h3>[요약] 미국 '탈중국' 기조로 HD현대삼호 등 韓 크레인 업계 반사이익 기대</h3>
+                            <ul class="news-links">
+                                <li><a href="https://www.yna.co.kr/view/AKR20240315012300003" target="_blank">HD현대 정기선 부회장, USTR 대표 면담... "항만 크레인 협력 제안"</a></li>
+                                <li><a href="https://www.joongang.co.kr/article/25234567" target="_blank">미국, 중국산 크레인 전면 교체에 27조 원 투입... 한국 수주 기회</a></li>
+                                <li><a href="https://www.paxetv.com/news/articleView.html?idxno=200123" target="_blank">HJ중공업·두산에너빌리티, 기술력 앞세워 미국 항만 장비 공략 확대</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: SCFI Index -->
+                <div class="widget chart-widget glass-panel">
+                    <div class="widget-header">
+                        <h2>🚢 SCFI Container Freight Index (1Y)</h2>
+                        <span class="subtitle">Shanghai Containerized Freight Index</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="scfiChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Charts -->
+            <div class="column column-right">
+                <!-- Section 2: Exchange Rate -->
+                <div class="widget chart-widget glass-panel">
+                    <div class="widget-header">
+                        <h2>💵 USD/KRW Exchange Rate (6M)</h2>
+                        <span class="subtitle">Peak at 1,503 KRW (Mar 2026)</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="exchangeRateChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Section 3: Crane Price Trends -->
+                <div class="widget chart-widget glass-panel">
+                    <div class="widget-header">
+                        <h2>🏗️ Crane Price Trends (Estimation)</h2>
+                        <span class="subtitle">STS, RTGC, DTQC Prices ($M) per Unit</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="cranePriceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Section 6: US Tariff (Trump 2026 Policy) -->
+                <div class="widget tariff-widget glass-panel">
+                    <div class="widget-header">
+                        <h2>🇺🇸 US Tariff Tracker (Port Cranes)</h2>
+                        <span class="subtitle">Expected 2026 Tariffs on STS & RTGC</span>
+                    </div>
+                    <div class="widget-content">
+                        <table class="tariff-table">
+                            <thead>
+                                <tr>
+                                    <th>Country</th>
+                                    <th>Status / Tariff Policy</th>
+                                    <th>Impact Level</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="flag">🇨🇳</span> China</td>
+                                    <td><b>100% ~ 270%</b> (Section 301, Security ban)</td>
+                                    <td><span class="impact-badge high">Critical</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="flag">🇻🇳</span> Vietnam</td>
+                                    <td><b>Potential Risk</b> (Sec 301 Investigation)</td>
+                                    <td><span class="impact-badge medium">Watch</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="flag">🇵🇭</span> Philippines</td>
+                                    <td><b>~19%</b> (ASEAN trade tension)</td>
+                                    <td><span class="impact-badge low">Moderate</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="flag">🇰🇷</span> South Korea</td>
+                                    <td><b>Opportunity / Watch</b> (US Ally, Sec 301 Review)</td>
+                                    <td><span class="impact-badge low">Favorable</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Section 5: Steel Price Index -->
+                <div class="widget chart-widget glass-panel">
+                    <div class="widget-header">
+                        <h2>⚙️ Global Steel Price Index (1Y)</h2>
+                        <span class="subtitle">Trend analysis across 2025-2026</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="steelPriceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>

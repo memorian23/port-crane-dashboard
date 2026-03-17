@@ -1,0 +1,279 @@
+:root {
+    /* Base Colors from Palette */
+    --color-green-1: #00d200; /* Bright Green */
+    --color-green-2: #00a01e; /* Medium Green */
+    --color-green-3: #0f852f; /* Dark Green */
+    --color-blue-1: #00308f;  /* Medium Blue */
+    --color-blue-2: #00205b;  /* Dark Blue */
+    
+    /* Neutral & Light Colors from Palette */
+    --color-neutral-dark: #003b30;
+    --color-neutral-grey: #6b6f70;
+    --color-light-green: #81d179;
+    --color-light-yellow: #c6e68d;
+    --color-light-blue: #b3e6e3;
+
+    /* Theme Variables Mapping */
+    --bg-color: #002554; /* Extracted from provided image */
+    --panel-bg: rgba(255, 255, 255, 0.06); /* Lighter glass effect */
+    --panel-border: rgba(255, 255, 255, 0.12); /* Brighter border */
+    
+    --text-main: #ffffff;
+    --text-muted: var(--color-light-blue);
+    
+    /* Accents for widgets and tags */
+    --accent-geo: var(--color-green-1);
+    --accent-ai: var(--color-light-green);
+    --accent-abroad: var(--color-light-yellow);
+    
+    --glass-blur: blur(16px);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background-color: var(--bg-color);
+    background-image: 
+        radial-gradient(circle at 15% 50%, rgba(0, 210, 0, 0.05), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(129, 209, 121, 0.05), transparent 25%);
+    background-attachment: fixed;
+    color: var(--text-main);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+.dashboard-container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Header */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--panel-border);
+}
+
+.dashboard-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #fff, var(--text-muted));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.3rem; 
+}
+
+.dashboard-header p {
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+.datetime-display {
+    color: var(--color-light-green);
+    font-size: 0.9rem;
+    font-weight: 500;
+    background: rgba(129, 209, 121, 0.15);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    border: 1px solid rgba(129, 209, 121, 0.3);
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+}
+
+/* Grid Layout */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 1.5rem;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Glassmorphism Panels */
+.glass-panel {
+    background: var(--panel-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.glass-panel:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Widget Headers */
+.widget-header {
+    margin-bottom: 1.2rem;
+}
+
+.widget-header h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.widget-header .subtitle {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+}
+
+/* News Section */
+.news-widget .widget-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.news-item {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    padding: 1.2rem;
+    border-left: 3px solid transparent;
+}
+
+.news-item:nth-child(1) { border-left-color: var(--accent-geo); }
+.news-item:nth-child(2) { border-left-color: var(--accent-ai); }
+.news-item:nth-child(3) { border-left-color: var(--accent-abroad); }
+
+.news-category {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 0.6rem;
+}
+
+.tag-geo { background: rgba(0, 210, 0, 0.15); color: var(--accent-geo); }
+.tag-ai { background: rgba(129, 209, 121, 0.15); color: var(--accent-ai); }
+.tag-abroad { background: rgba(198, 230, 141, 0.15); color: var(--accent-abroad); }
+
+.news-item h3 {
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #fff;
+}
+
+.news-item p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.news-links {
+    list-style-type: none;
+    margin-top: 0.5rem;
+    padding-left: 0.2rem;
+}
+
+.news-links li {
+    margin-bottom: 0.4rem;
+    position: relative;
+    padding-left: 1.2rem;
+}
+
+.news-links li::before {
+    content: "•";
+    color: var(--color-green-1);
+    position: absolute;
+    left: 0;
+    top: -2px;
+    font-size: 1.2rem;
+}
+
+.news-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s ease, text-decoration 0.2s ease;
+    display: inline-block;
+}
+
+.news-links a:hover {
+    color: #fff;
+    text-decoration: underline;
+    text-decoration-color: var(--color-green-1);
+    text-underline-offset: 3px;
+}
+
+/* Charts */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+/* Tariff Table */
+.tariff-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.tariff-table th, .tariff-table td {
+    padding: 0.8rem;
+    text-align: left;
+    border-bottom: 1px solid var(--panel-border);
+}
+
+.tariff-table th {
+    color: var(--color-light-blue);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+.tariff-table td {
+    color: var(--text-main);
+}
+
+.tariff-table b {
+    color: var(--color-light-yellow);
+}
+
+.flag {
+    margin-right: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.impact-badge {
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.impact-badge.high { background: rgba(255, 123, 114, 0.2); color: #ff7b72; }
+.impact-badge.medium { background: rgba(240, 136, 62, 0.2); color: #f0883e; }
+.impact-badge.low { background: rgba(129, 209, 121, 0.2); color: var(--color-light-green); }
+
+@media (max-width: 1200px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
