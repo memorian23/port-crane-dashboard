@@ -14,8 +14,8 @@
     --color-light-blue: #b3e6e3;
 
     /* Theme Variables Mapping */
-    --bg-color: #002554; /* Extracted from provided image */
-    --panel-bg: rgba(255, 255, 255, 0.06); /* Lighter glass effect */
+    --bg-color: #020c1b; /* Very dark navy */
+    --panel-bg: rgba(255, 255, 255, 0.05); /* Slightly Adjusted glass effect */
     --panel-border: rgba(255, 255, 255, 0.12); /* Brighter border */
     
     --text-main: #ffffff;
