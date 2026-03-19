@@ -31,35 +31,33 @@
             <div class="column column-left">
                 <!-- Section 1: News Summaries -->
                 <div class="widget news-widget glass-panel">
-                    <div class="widget-header">
+                    <div class="widget-header" style="display: flex; justify-content: space-between; align-items: center;">
                         <h2>📰 Weekly Industry Briefing</h2>
+                        <button id="refresh-news-btn" class="refresh-btn" style="padding: 0.3rem 0.8rem; font-size: 0.75rem;">🔄 News Refresh</button>
                     </div>
                     <div class="widget-content">
-                        <div class="news-item">
-                            <span class="news-category tag-geo">Geopolitics</span>
-                            <h3>[요약] 미중 갈등 및 중동 사태 장기화로 글로벌 해상 공급망 불안정성 심화</h3>
+                        <div class="news-item" id="news-exchange">
+                            <span class="news-category tag-exchange">Exchange Rate</span>
+                            <h3>[요약] 로딩 중...</h3>
                             <ul class="news-links">
-                                <li><a href="https://www.kita.net/cmmrcInfo/cmercInfo/cmercReport/cmercReportDetail.do" target="_blank">미중 갈등 속 공급망 다변화 및 프렌드쇼어링 부각</a></li>
-                                <li><a href="https://www.dailyan.com/news/articleView.html" target="_blank">지역 분쟁 확대로 해상 운송 비용 및 물류 차질 리스크 증가</a></li>
-                                <li><a href="https://www.klnews.co.kr/news/articleView.html" target="_blank">홍해 발 물류 위기 장기화... 글로벌 공급망 대응 전략 시급</a></li>
                             </ul>
                         </div>
-                        <div class="news-item">
-                            <span class="news-category tag-ai">Physical AI</span>
-                            <h3>[요약] 부산항 '피지컬 AI' 전면 도입 추진으로 하역 생산성 향상 및 안전 무인화 속도</h3>
+                        <div class="news-item" id="news-tariff">
+                            <span class="news-category tag-tariff">Tariff Policy</span>
+                            <h3>[요약] 로딩 중...</h3>
                             <ul class="news-links">
-                                <li><a href="https://www.sedaily.com/NewsView/" target="_blank">부산항만공사, 총 8,921억 투입해 2030년까지 '미래형 초연결 AI 항만' 구축</a></li>
-                                <li><a href="https://www.newsis.com/view/" target="_blank">BPA-BIPA 협력 체결, AI 물류통합플랫폼 구현 및 자율주행 트럭 도입</a></li>
-                                <li><a href="https://www.smartmaritimenetwork.com/" target="_blank">신항 5부두, '피지컬 AI' 기반 충돌 방지 및 고위험 작업 무인 모니터링 적용</a></li>
                             </ul>
                         </div>
-                        <div class="news-item">
-                            <span class="news-category tag-abroad">Abroad Strategy</span>
-                            <h3>[요약] 미 '탈중국' 항만 크레인 교체 정책 본격화, 한국 기업들의 시장 진출 기회 기대</h3>
+                        <div class="news-item" id="news-oil">
+                            <span class="news-category tag-oil">Oil Price</span>
+                            <h3>[요약] 로딩 중...</h3>
                             <ul class="news-links">
-                                <li><a href="https://www.businesspost.co.kr/BP?command=article_view" target="_blank">미국 항만 크레인 27조 교체 사업 돌입… HD현대 정기선 부회장, 협력 적극 제안</a></li>
-                                <li><a href="https://www.joongang.co.kr/article/" target="_blank">미 USTR, 중국산 크레인 100% 관세 추진... 두산에너빌리티, 베트남 수주 확보</a></li>
-                                <li><a href="https://www.paxetv.com/news/articleView.html" target="_blank">HJ중공업, 부산신항 트랜스퍼 크레인 수주 성공... 미주 진출 향한 K장비 경쟁력 입증</a></li>
+                            </ul>
+                        </div>
+                        <div class="news-item" id="news-freight">
+                            <span class="news-category tag-freight">Freight Rate</span>
+                            <h3>[요약] 로딩 중...</h3>
+                            <ul class="news-links">
                             </ul>
                         </div>
                     </div>
@@ -96,25 +94,28 @@
                     </div>
                 </div>
 
-                <!-- Section 3: Crane Price Trends -->
+                <!-- Section 3: Oil Price (WTI) -->
                 <div class="widget chart-widget glass-panel">
                     <div class="widget-header">
-                        <h2>🏗️ Crane Price Trends (Estimation)</h2>
-                        <span class="subtitle">STS, RTGC, DTQC Prices ($M) per Unit</span>
+                        <h2>🛢️ WTI Crude Oil Price (6M)</h2>
+                        <span class="subtitle">Global Energy Market Trends ($/bbl)</span>
                     </div>
                     <div class="chart-container">
-                        <canvas id="cranePriceChart"></canvas>
+                        <canvas id="oilPriceChart"></canvas>
                     </div>
                     <div class="chart-source">
-                        <a href="https://www.worldcargonews.com/" target="_blank">Source: World Cargo News & Industry Analysis</a>
+                        <a href="https://tradingeconomics.com/commodity/crude-oil" target="_blank">Source: Trading Economics (WTI)</a>
                     </div>
                 </div>
 
-                <!-- Section 6: US Tariff (Trump 2026 Policy) -->
+                <!-- Section 4: US Tariff Tracker -->
                 <div class="widget tariff-widget glass-panel">
                     <div class="widget-header">
                         <h2>🇺🇸 US Tariff Tracker (Port Cranes)</h2>
                         <span class="subtitle">Expected 2026 Tariffs on STS & RTGC</span>
+                    </div>
+                    <div class="chart-container" style="height: 200px; margin-bottom: 1rem;">
+                        <canvas id="tariffChart"></canvas>
                     </div>
                     <div class="widget-content">
                         <table class="tariff-table">
@@ -128,40 +129,26 @@
                             <tbody>
                                 <tr>
                                     <td><span class="flag">🇨🇳</span> China</td>
-                                    <td><b>100% ~ 270%</b> (Section 301, Security ban)</td>
+                                    <td><b>100% ~ 270%</b> (Security ban)</td>
                                     <td><span class="impact-badge high">Critical</span></td>
                                 </tr>
                                 <tr>
                                     <td><span class="flag">🇻🇳</span> Vietnam</td>
-                                    <td><b>Potential Risk</b> (Sec 301 Investigation)</td>
+                                    <td><b>10% Range</b> (Investigation)</td>
                                     <td><span class="impact-badge medium">Watch</span></td>
                                 </tr>
                                 <tr>
                                     <td><span class="flag">🇵🇭</span> Philippines</td>
-                                    <td><b>~19%</b> (ASEAN trade tension)</td>
+                                    <td><b>~19%</b> (Trade tension)</td>
                                     <td><span class="impact-badge low">Moderate</span></td>
                                 </tr>
                                 <tr>
                                     <td><span class="flag">🇰🇷</span> South Korea</td>
-                                    <td><b>Opportunity / Watch</b> (US Ally, Sec 301 Review)</td>
+                                    <td><b>0%</b> (Favorable, US Ally)</td>
                                     <td><span class="impact-badge low">Favorable</span></td>
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
-                </div>
-
-                <!-- Section 5: Steel Price Index -->
-                <div class="widget chart-widget glass-panel">
-                    <div class="widget-header">
-                        <h2>⚙️ Global Steel Price Index (1Y)</h2>
-                        <span class="subtitle">Trend analysis across 2025-2026</span>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="steelPriceChart"></canvas>
-                    </div>
-                    <div class="chart-source">
-                        <a href="https://tradingeconomics.com/commodity/steel" target="_blank">Source: Trading Economics (Steel)</a>
                     </div>
                 </div>
             </div>

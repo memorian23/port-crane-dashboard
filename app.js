@@ -24,6 +24,71 @@ setInterval(() => {
     location.reload();
 }, REFRESH_INTERVAL_MS);
 
+// --- NEWS FETCHING LOGIC ---
+const NEWS_CATEGORIES = [
+    { id: 'news-exchange', tagClass: 'tag-exchange', tagText: 'Exchange Rate', query: '환율 전망' },
+    { id: 'news-tariff', tagClass: 'tag-tariff', tagText: 'Tariff Policy', query: '미국 관세 항만 크레인' },
+    { id: 'news-oil', tagClass: 'tag-oil', tagText: 'Oil Price', query: '국제 유가 WTI' },
+    { id: 'news-freight', tagClass: 'tag-freight', tagText: 'Freight Rate', query: '컨테이너선 운임 SCFI' }
+];
+
+async function updateNews() {
+    const btn = document.getElementById('refresh-news-btn');
+    if (btn) btn.innerText = '🔄 Loading...';
+
+    for (const cat of NEWS_CATEGORIES) {
+        try {
+            const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(cat.query)}&hl=ko&gl=KR&ceid=KR:ko`;
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
+            
+            const response = await fetch(proxyUrl);
+            const data = await response.json();
+            
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(data.contents, "text/xml");
+            const items = Array.from(xmlDoc.querySelectorAll("item")).slice(0, 3);
+            
+            if (items.length > 0) {
+                const container = document.getElementById(cat.id);
+                if (!container) continue;
+
+                // Create a 1-line pseudo summary based on the first returned article
+                const firstTitle = items[0].querySelector("title").textContent.split(' - ')[0]; 
+                const summaryText = `[최신 동향] ${firstTitle} 등 관련 주요 소식`;
+
+                let linksHtml = '<ul class="news-links">';
+                items.forEach(item => {
+                    let title = item.querySelector("title").textContent;
+                    // Clean up publisher names that usually follow a dash " - "
+                    title = title.split(' - ')[0].trim();
+                     // Limit title length to prevent extremely long links breaking layout
+                    if(title.length > 60) title = title.substring(0, 60) + '...';
+                    
+                    const link = item.querySelector("link").textContent;
+                    linksHtml += `<li><a href="${link}" target="_blank">${title}</a></li>`;
+                });
+                linksHtml += '</ul>';
+
+                // Re-render the widget HTML
+                container.innerHTML = `
+                    <span class="news-category ${cat.tagClass}">${cat.tagText}</span>
+                    <h3>${summaryText}</h3>
+                    ${linksHtml}
+                `;
+            }
+        } catch (error) {
+            console.error(`Failed to fetch news for ${cat.query}`, error);
+        }
+    }
+    
+    if (btn) btn.innerText = '🔄 News Refresh';
+}
+
+// Bind button and fetch initially
+document.getElementById('refresh-news-btn')?.addEventListener('click', updateNews);
+// Also fetch immediately on load so we get live data instead of static placeholders over time
+updateNews();
+
 // Chart Theme Configuration
 Chart.defaults.color = '#8b949e';
 Chart.defaults.font.family = "'Inter', sans-serif";
@@ -92,30 +157,20 @@ function updateExchangeRateUI(rate) {
     }
 }
 
-// 2. Crane Price Trends (STS, RTGC, DTQC)
-// Prices estimated per unit in Million USD.
-const craneData = {
-    labels: ['2023', '2024', '2025', '2026 (Est)'],
-    datasets: [
-        {
-            label: 'STS (Standard, 50T)',
-            data: [6.8, 7.0, 7.5, 7.8],
-            backgroundColor: '#6b6f70', /* Neutral Grey */
-            borderRadius: 4
-        },
-        {
-            label: 'RTGC',
-            data: [1.8, 1.9, 2.1, 2.2],
-            backgroundColor: '#81d179', /* Light Green */
-            borderRadius: 4
-        },
-        {
-            label: 'DTQC (Automated)',
-            data: [15.0, 15.5, 16.2, 16.8],
-            backgroundColor: '#b3e6e3', /* Light Blue */
-            borderRadius: 4
-        }
-    ]
+// 2. WTI Crude Oil Price (Past 6 Months)
+const oilPriceData = {
+    labels: ['Oct 25', 'Nov 25', 'Dec 25', 'Jan 26', 'Feb 26', 'Mar 26'],
+    datasets: [{
+        label: 'WTI Crude ($/bbl)',
+        data: [78.5, 75.2, 72.8, 70.5, 74.0, 77.2],
+        borderColor: '#ff7b72', /* Reddish accent */
+        backgroundColor: 'rgba(255, 123, 114, 0.1)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#ff7b72',
+        pointRadius: 4
+    }]
 };
 
 // 3. SCFI Index (Past 1 Year)
@@ -132,17 +187,19 @@ const scfiData = {
     }]
 };
 
-// 4. Global Steel Price Index
-const steelData = {
-    labels: ['Mar 25', 'May 25', 'Jul 25', 'Sep 25', 'Nov 25', 'Jan 26', 'Mar 26'],
+// 4. US Tariff Chart Data
+const tariffData = {
+    labels: ['China', 'Vietnam', 'Philippines', 'South Korea'],
     datasets: [{
-        label: 'Steel Price Index',
-        data: [110, 105, 95, 90, 88, 92, 96], // Illustrative index values
-        borderColor: '#c6e68d', /* Light Yellow/Green */
-        backgroundColor: 'rgba(198, 230, 141, 0.1)',
-        borderWidth: 2,
-        fill: true,
-        tension: 0.4
+        label: 'Expected Tariff (%)',
+        data: [100, 10, 19, 0],
+        backgroundColor: [
+            '#ff7b72', // Critical
+            '#f0883e', // Watch
+            '#81d179', // Moderate
+            '#00d200'  // Favorable
+        ],
+        borderRadius: 4
     }]
 };
 
@@ -166,19 +223,17 @@ window.onload = function() {
         }
     });
 
-    // Crane Price Chart
-    new Chart(document.getElementById('cranePriceChart').getContext('2d'), {
-        type: 'bar',
-        data: craneData,
+    // WTI Oil Price Chart
+    new Chart(document.getElementById('oilPriceChart').getContext('2d'), {
+        type: 'line',
+        data: oilPriceData,
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } }
-            },
+            plugins: { legend: { display: false } },
             scales: {
-                y: { grid: gridConfig, title: { display: true, text: 'Price ($M)' } },
-                x: { grid: { display: false } }
+                y: { grid: gridConfig, title: { display: true, text: 'Price ($/bbl)' } },
+                x: { grid: gridConfig }
             }
         }
     });
@@ -198,17 +253,18 @@ window.onload = function() {
         }
     });
 
-    // Steel Price Chart
-    new Chart(document.getElementById('steelPriceChart').getContext('2d'), {
-        type: 'line',
-        data: steelData,
+    // Tariff Chart
+    new Chart(document.getElementById('tariffChart').getContext('2d'), {
+        type: 'bar',
+        data: tariffData,
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
+            indexAxis: 'y', // Horizontal bar chart
             scales: {
-                y: { grid: gridConfig },
-                x: { grid: gridConfig }
+                x: { grid: gridConfig, title: { display: true, text: 'Tariff Rate (%)' }, max: 120 },
+                y: { grid: { display: false } }
             }
         }
     });

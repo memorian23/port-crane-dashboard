@@ -183,9 +183,10 @@ body {
     border-left: 3px solid transparent;
 }
 
-.news-item:nth-child(1) { border-left-color: var(--accent-geo); }
-.news-item:nth-child(2) { border-left-color: var(--accent-ai); }
-.news-item:nth-child(3) { border-left-color: var(--accent-abroad); }
+.news-item:nth-child(1) { border-left-color: var(--color-green-1); }
+.news-item:nth-child(2) { border-left-color: var(--color-light-yellow); }
+.news-item:nth-child(3) { border-left-color: #ff7b72; }
+.news-item:nth-child(4) { border-left-color: var(--color-light-blue); }
 
 .news-category {
     font-size: 0.75rem;
@@ -197,9 +198,10 @@ body {
     margin-bottom: 0.6rem;
 }
 
-.tag-geo { background: rgba(0, 210, 0, 0.15); color: var(--accent-geo); }
-.tag-ai { background: rgba(129, 209, 121, 0.15); color: var(--accent-ai); }
-.tag-abroad { background: rgba(198, 230, 141, 0.15); color: var(--accent-abroad); }
+.tag-exchange { background: rgba(0, 210, 0, 0.15); color: var(--color-green-1); }
+.tag-tariff { background: rgba(198, 230, 141, 0.15); color: var(--color-light-yellow); }
+.tag-oil { background: rgba(255, 123, 114, 0.15); color: #ff7b72; }
+.tag-freight { background: rgba(179, 230, 227, 0.15); color: var(--color-light-blue); }
 
 .news-item h3 {
     font-size: 1.05rem;
