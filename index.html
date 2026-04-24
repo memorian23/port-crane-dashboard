@@ -36,26 +36,26 @@
                         <button id="refresh-news-btn" class="refresh-btn" style="padding: 0.3rem 0.8rem; font-size: 0.75rem;">🔄 News Refresh</button>
                     </div>
                     <div class="widget-content">
-                        <div class="news-item" id="news-exchange">
-                            <span class="news-category tag-exchange">Exchange Rate</span>
+                        <div class="news-item" id="news-cost">
+                            <span class="news-category tag-cost">💰 원가절감 (Cost Savings)</span>
                             <h3>[요약] 로딩 중...</h3>
                             <ul class="news-links">
                             </ul>
                         </div>
-                        <div class="news-item" id="news-tariff">
-                            <span class="news-category tag-tariff">Tariff Policy</span>
+                        <div class="news-item" id="news-ai">
+                            <span class="news-category tag-ai">🤖 Physical AI</span>
                             <h3>[요약] 로딩 중...</h3>
                             <ul class="news-links">
                             </ul>
                         </div>
-                        <div class="news-item" id="news-oil">
-                            <span class="news-category tag-oil">Oil Price</span>
+                        <div class="news-item" id="news-geo">
+                            <span class="news-category tag-geo">🌏 Geopolitics</span>
                             <h3>[요약] 로딩 중...</h3>
                             <ul class="news-links">
                             </ul>
                         </div>
-                        <div class="news-item" id="news-freight">
-                            <span class="news-category tag-freight">Freight Rate</span>
+                        <div class="news-item" id="news-abroad">
+                            <span class="news-category tag-abroad">🚢 Abroad (파트너·경쟁사)</span>
                             <h3>[요약] 로딩 중...</h3>
                             <ul class="news-links">
                             </ul>
@@ -94,17 +94,17 @@
                     </div>
                 </div>
 
-                <!-- Section 3: Oil Price (WTI) -->
+                <!-- Section 3: Oil Price (WTI / Brent / Dubai) -->
                 <div class="widget chart-widget glass-panel">
                     <div class="widget-header">
-                        <h2>🛢️ WTI Crude Oil Price (6M)</h2>
-                        <span class="subtitle">Global Energy Market Trends ($/bbl)</span>
+                        <h2>🛢️ Crude Oil Prices (6M)</h2>
+                        <span class="subtitle">WTI · Brent · Dubai ($/bbl) &nbsp;|&nbsp; <span id="oil-price-subtitle">로딩 중...</span></span>
                     </div>
                     <div class="chart-container">
                         <canvas id="oilPriceChart"></canvas>
                     </div>
                     <div class="chart-source">
-                        <a href="https://tradingeconomics.com/commodity/crude-oil" target="_blank">Source: Trading Economics (WTI)</a>
+                        <a href="https://tradingeconomics.com/commodity/crude-oil" target="_blank">Source: Trading Economics</a>
                     </div>
                 </div>
 

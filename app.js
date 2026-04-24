@@ -26,10 +26,10 @@ setInterval(() => {
 
 // --- NEWS FETCHING LOGIC ---
 const NEWS_CATEGORIES = [
-    { id: 'news-exchange', tagClass: 'tag-exchange', tagText: 'Exchange Rate', query: '환율 전망' },
-    { id: 'news-tariff', tagClass: 'tag-tariff', tagText: 'Tariff Policy', query: '미국 관세 항만 크레인' },
-    { id: 'news-oil', tagClass: 'tag-oil', tagText: 'Oil Price', query: '국제 유가 WTI' },
-    { id: 'news-freight', tagClass: 'tag-freight', tagText: 'Freight Rate', query: '컨테이너선 운임 SCFI' }
+    { id: 'news-cost',   tagClass: 'tag-cost',   tagText: '💰 원가절감 (Cost Savings)', query: '항만 크레인 원가절감 물류비 자동화 비용' },
+    { id: 'news-ai',     tagClass: 'tag-ai',     tagText: '🤖 Physical AI',             query: 'Physical AI 로봇 자동화 항만 물류' },
+    { id: 'news-geo',    tagClass: 'tag-geo',    tagText: '🌏 Geopolitics',             query: '미국 중국 지정학 무역분쟁 관세 항만 리스크' },
+    { id: 'news-abroad', tagClass: 'tag-abroad', tagText: '🚢 Abroad (파트너·경쟁사)',  query: 'ZPMC LIEBHERR SANY KONE 크레인 항만 수주 HD현대에코비나' }
 ];
 
 async function updateNews() {
@@ -157,21 +157,49 @@ function updateExchangeRateUI(rate) {
     }
 }
 
-// 2. WTI Crude Oil Price (Past 6 Months)
+// 2. Crude Oil Prices – WTI / Brent / Dubai (Past 6 Months)
 const oilPriceData = {
-    labels: ['Oct 25', 'Nov 25', 'Dec 25', 'Jan 26', 'Feb 26', 'Mar 26'],
-    datasets: [{
-        label: 'WTI Crude ($/bbl)',
-        data: [78.5, 75.2, 72.8, 70.5, 74.0, 77.2],
-        borderColor: '#ff7b72', /* Reddish accent */
-        backgroundColor: 'rgba(255, 123, 114, 0.1)',
-        borderWidth: 2,
-        fill: true,
-        tension: 0.4,
-        pointBackgroundColor: '#ff7b72',
-        pointRadius: 4
-    }]
+    labels: ['Oct 25', 'Nov 25', 'Dec 25', 'Jan 26', 'Feb 26', 'Mar 26', 'Apr 26'],
+    datasets: [
+        {
+            label: 'WTI ($/bbl)',
+            data: [71.2, 68.8, 70.1, 73.5, 70.8, 67.4, 63.1],
+            borderColor: '#ff7b72',
+            backgroundColor: 'rgba(255, 123, 114, 0.08)',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.4,
+            pointRadius: 3
+        },
+        {
+            label: 'Brent ($/bbl)',
+            data: [74.5, 72.1, 73.6, 76.8, 74.2, 70.9, 66.4],
+            borderColor: '#f0883e',
+            backgroundColor: 'rgba(240, 136, 62, 0.08)',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.4,
+            pointRadius: 3
+        },
+        {
+            label: 'Dubai ($/bbl)',
+            data: [73.1, 70.8, 72.4, 75.6, 72.9, 69.5, 65.0],
+            borderColor: '#c6e68d',
+            backgroundColor: 'rgba(198, 230, 141, 0.08)',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.4,
+            pointRadius: 3
+        }
+    ]
 };
+
+function updateOilSubtitle() {
+    const el = document.getElementById('oil-price-subtitle');
+    if (!el) return;
+    const last = oilPriceData.datasets.map(ds => `${ds.label.split(' ')[0]} $${ds.data[ds.data.length - 1]}`);
+    el.innerText = last.join(' · ');
+}
 
 // 3. SCFI Index (Past 1 Year)
 const scfiData = {
@@ -223,20 +251,26 @@ window.onload = function() {
         }
     });
 
-    // WTI Oil Price Chart
+    // Oil Price Chart (WTI / Brent / Dubai)
     new Chart(document.getElementById('oilPriceChart').getContext('2d'), {
         type: 'line',
         data: oilPriceData,
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: { color: '#8b949e', font: { size: 11 }, boxWidth: 20 }
+                }
+            },
             scales: {
                 y: { grid: gridConfig, title: { display: true, text: 'Price ($/bbl)' } },
                 x: { grid: gridConfig }
             }
         }
     });
+    updateOilSubtitle();
 
     // SCFI Chart
     new Chart(document.getElementById('scfiChart').getContext('2d'), {
