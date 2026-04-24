@@ -26,10 +26,10 @@ setInterval(() => {
 
 // --- NEWS FETCHING LOGIC ---
 const NEWS_CATEGORIES = [
-    { id: 'news-cost',   tagClass: 'tag-cost',   tagText: '💰 원가절감 (Cost Savings)', query: '항만 크레인 원가절감 물류비 자동화 비용' },
-    { id: 'news-ai',     tagClass: 'tag-ai',     tagText: '🤖 Physical AI',             query: 'Physical AI 로봇 자동화 항만 물류' },
-    { id: 'news-geo',    tagClass: 'tag-geo',    tagText: '🌏 Geopolitics',             query: '미국 중국 지정학 무역분쟁 관세 항만 리스크' },
-    { id: 'news-abroad', tagClass: 'tag-abroad', tagText: '🚢 Abroad (파트너·경쟁사)',  query: 'ZPMC LIEBHERR SANY KONE 크레인 항만 수주 HD현대에코비나' }
+    { id: 'news-cost',   tagClass: 'tag-cost',   tagText: 'Key Cost Savings', query: '항만 크레인 원가절감 물류비 자동화 비용' },
+    { id: 'news-ai',     tagClass: 'tag-ai',     tagText: 'Physical AI',      query: 'Physical AI 로봇 자동화 항만 물류' },
+    { id: 'news-geo',    tagClass: 'tag-geo',    tagText: 'Geopolitics',      query: '미국 중국 지정학 무역분쟁 관세 항만 리스크' },
+    { id: 'news-abroad', tagClass: 'tag-abroad', tagText: 'Abroad',           query: 'ZPMC LIEBHERR SANY KONE 크레인 항만 수주 HD현대에코비나' }
 ];
 
 async function updateNews() {
