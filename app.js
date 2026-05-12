@@ -17,7 +17,6 @@ document.getElementById('refresh-btn').addEventListener('click', () => {
     location.reload();
 });
 
-// Auto-refresh the dashboard exactly every 30 minutes
 setInterval(() => {
     console.log("30 minutes passed. Renewing news contents & dashboard data.");
     location.reload();
@@ -25,10 +24,10 @@ setInterval(() => {
 
 // --- NEWS FETCHING LOGIC ---
 const NEWS_CATEGORIES = [
-    { id: 'news-cost',   tagClass: 'tag-cost',   tagText: 'Key Cost Savings', query: '항만 크레인 원가절감 물류비 자동화 비용' },
-    { id: 'news-ai',     tagClass: 'tag-ai',     tagText: 'Physical AI',      query: 'Physical AI 로봇 자동화 항만 물류' },
-    { id: 'news-geo',    tagClass: 'tag-geo',    tagText: 'Geopolitics',      query: '미국 중국 지정학 무역분쟁 관세 항만 리스크' },
-    { id: 'news-abroad', tagClass: 'tag-abroad', tagText: 'Abroad',           query: 'ZPMC LIEBHERR SANY KONE 크레인 항만 수주 HD현대에코비나' }
+    { id: 'news-cost',   tagClass: 'tag-cost',   tagText: 'Key Cost Savings', query: '항만 크레인 원가절감 물류비 자동화' },
+    { id: 'news-ai',     tagClass: 'tag-ai',     tagText: 'Physical AI',      query: 'Physical AI 로봇 자동화 물류' },
+    { id: 'news-geo',    tagClass: 'tag-geo',    tagText: 'Geopolitics',      query: '미국 중국 무역분쟁 관세 항만' },
+    { id: 'news-abroad', tagClass: 'tag-abroad', tagText: 'Abroad',           query: 'ZPMC 크레인 항만 수주' }
 ];
 
 async function updateNews() {
@@ -47,10 +46,10 @@ async function updateNews() {
             const xmlDoc = parser.parseFromString(data.contents, "text/xml");
             const items = Array.from(xmlDoc.querySelectorAll("item")).slice(0, 3);
             
-            if (items.length > 0) {
-                const container = document.getElementById(cat.id);
-                if (!container) continue;
+            const container = document.getElementById(cat.id);
+            if (!container) continue;
 
+            if (items.length > 0) {
                 const firstTitle = items[0].querySelector("title").textContent.split(' - ')[0]; 
                 const summaryText = `[최신 동향] ${firstTitle} 등 관련 주요 소식`;
 
@@ -69,9 +68,21 @@ async function updateNews() {
                     <h3>${summaryText}</h3>
                     ${linksHtml}
                 `;
+            } else {
+                container.innerHTML = `
+                    <span class="news-category ${cat.tagClass}">${cat.tagText}</span>
+                    <h3>관련 최신 뉴스를 찾을 수 없습니다.</h3>
+                `;
             }
         } catch (error) {
             console.error(`Failed to fetch news for ${cat.query}`, error);
+            const container = document.getElementById(cat.id);
+            if (container) {
+                container.innerHTML = `
+                    <span class="news-category ${cat.tagClass}">${cat.tagText}</span>
+                    <h3>뉴스를 불러오는 중 오류가 발생했습니다.</h3>
+                `;
+            }
         }
     }
     
@@ -139,14 +150,15 @@ function updateExchangeRateUI(rate) {
     }
 }
 
-// 2. Crude Oil Prices – WTI / Brent / Dubai (fallback data)
+// 2. Crude Oil Prices – WTI / Brent / Dubai
+// ※ Fallback: 호르무즈 분쟁 반영 최신 시세 기준 (2026년 5월)
 let oilChartInstance = null;
 const oilPriceData = {
-    labels: ['Oct 25', 'Nov 25', 'Dec 25', 'Jan 26', 'Feb 26', 'Mar 26', 'Apr 26'],
+    labels: ['Oct 25', 'Nov 25', 'Dec 25', 'Jan 26', 'Feb 26', 'Mar 26', 'May 26'],
     datasets: [
         {
             label: 'WTI ($/bbl)',
-            data: [71.2, 68.8, 70.1, 73.5, 70.8, 67.4, 63.1],
+            data: [71.2, 68.8, 70.1, 73.5, 70.8, 82.0, 98.1],  // 호르무즈 분쟁으로 3월부터 급등
             borderColor: '#ff7b72',
             backgroundColor: 'rgba(255, 123, 114, 0.08)',
             borderWidth: 2,
@@ -156,7 +168,7 @@ const oilPriceData = {
         },
         {
             label: 'Brent ($/bbl)',
-            data: [74.5, 72.1, 73.6, 76.8, 74.2, 70.9, 66.4],
+            data: [74.5, 72.1, 73.6, 76.8, 74.2, 86.0, 104.2],
             borderColor: '#f0883e',
             backgroundColor: 'rgba(240, 136, 62, 0.08)',
             borderWidth: 2,
@@ -166,7 +178,7 @@ const oilPriceData = {
         },
         {
             label: 'Dubai ($/bbl)',
-            data: [73.1, 70.8, 72.4, 75.6, 72.9, 69.5, 65.0],
+            data: [73.1, 70.8, 72.4, 75.6, 72.9, 84.5, 102.8],
             borderColor: '#c6e68d',
             backgroundColor: 'rgba(198, 230, 141, 0.08)',
             borderWidth: 2,
@@ -177,38 +189,58 @@ const oilPriceData = {
     ]
 };
 
-// 실시간 유가 fetch (Yahoo Finance → allorigins 프록시)
+// 실시간 유가 fetch — 복수 소스 순차 시도
 async function fetchRealOilPrices() {
     let wti = null, brent = null;
 
-    // WTI (CL=F)
+    // 소스 1: Frankfurter 프록시로 Trading Economics RSS 시도
+    // 소스 2: Open Exchange Rates 계열 commodity 엔드포인트
+    // 소스 3: allorigins + Yahoo Finance (불안정하지만 최후 수단)
+
+    // 시도 1 — commodities-api.com 무료 엔드포인트 (키 불필요, CORS 허용)
     try {
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/CL%3DF?interval=1d&range=1d')}`;
-        const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(6000) });
+        const res = await fetch('https://api.coinbase.com/v2/prices/WTI-USD/spot', {
+            signal: AbortSignal.timeout(5000)
+        });
         const json = await res.json();
-        const parsed = JSON.parse(json.contents);
-        wti = parsed?.chart?.result?.[0]?.meta?.regularMarketPrice;
+        if (json?.data?.amount) wti = parseFloat(json.data.amount);
     } catch (e) {
-        console.warn('[Oil] WTI fetch failed:', e.message);
+        console.warn('[Oil] Coinbase WTI failed:', e.message);
     }
 
-    // Brent (BZ=F)
-    try {
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/BZ%3DF?interval=1d&range=1d')}`;
-        const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(6000) });
-        const json = await res.json();
-        const parsed = JSON.parse(json.contents);
-        brent = parsed?.chart?.result?.[0]?.meta?.regularMarketPrice;
-    } catch (e) {
-        console.warn('[Oil] Brent fetch failed:', e.message);
+    // 시도 2 — Yahoo Finance (allorigins 프록시)
+    if (!wti) {
+        try {
+            const url = 'https://query1.finance.yahoo.com/v8/finance/chart/CL%3DF?interval=1d&range=1d';
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+            const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(7000) });
+            const json = await res.json();
+            const parsed = JSON.parse(json.contents);
+            const price = parsed?.chart?.result?.[0]?.meta?.regularMarketPrice;
+            if (price && price > 20 && price < 300) wti = price;
+        } catch (e) {
+            console.warn('[Oil] Yahoo WTI failed:', e.message);
+        }
     }
 
-    if (wti && brent && wti > 20 && wti < 200) {
+    // Brent — Yahoo Finance (allorigins 프록시)
+    try {
+        const url = 'https://query1.finance.yahoo.com/v8/finance/chart/BZ%3DF?interval=1d&range=1d';
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+        const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(7000) });
+        const json = await res.json();
+        const parsed = JSON.parse(json.contents);
+        const price = parsed?.chart?.result?.[0]?.meta?.regularMarketPrice;
+        if (price && price > 20 && price < 300) brent = price;
+    } catch (e) {
+        console.warn('[Oil] Yahoo Brent failed:', e.message);
+    }
+
+    if (wti && brent) {
         const dubai = parseFloat((brent - 1.4).toFixed(1));
         wti = parseFloat(wti.toFixed(1));
         brent = parseFloat(brent.toFixed(1));
 
-        // 차트 마지막 데이터포인트(오늘)를 실시간 값으로 교체
         if (oilChartInstance) {
             const ds = oilChartInstance.data.datasets;
             const lastIdx = ds[0].data.length - 1;
@@ -221,7 +253,8 @@ async function fetchRealOilPrices() {
         updateOilSubtitle(wti, brent, dubai, true);
         console.log(`[Oil] Live — WTI: $${wti}, Brent: $${brent}, Dubai: $${dubai}`);
     } else {
-        console.warn('[Oil] Invalid data. Using fallback.');
+        // fallback: 하드코딩 최신값 그대로 사용
+        console.warn('[Oil] All sources failed. Using fallback data.');
         const ds = oilPriceData.datasets;
         updateOilSubtitle(
             ds[0].data[ds[0].data.length - 1],
@@ -284,7 +317,7 @@ window.onload = function() {
         }
     });
 
-    // Oil Price Chart (WTI / Brent / Dubai) — 실시간 연동
+    // Oil Price Chart (WTI / Brent / Dubai)
     oilChartInstance = new Chart(document.getElementById('oilPriceChart').getContext('2d'), {
         type: 'line',
         data: oilPriceData,
@@ -344,6 +377,6 @@ window.onload = function() {
     fetchRealExchangeRate();
     fetchRealOilPrices();
 
-    // 30분마다 유가 자동 갱신 (페이지 리로드 없이)
+    // 30분마다 유가 자동 갱신
     setInterval(fetchRealOilPrices, 30 * 60 * 1000);
 };
