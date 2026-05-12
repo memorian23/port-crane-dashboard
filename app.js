@@ -3,7 +3,7 @@
 // ============================================================
 
 // ★ Gemini API Key — 여기에 입력하세요
-const GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY_HERE';
+const GEMINI_API_KEY = 'AIzaSyAE81Xx2nc0rN5AauWXEt6_tdPTARoBCTU';
 
 // ── TIME ──
 function updateTime() {
