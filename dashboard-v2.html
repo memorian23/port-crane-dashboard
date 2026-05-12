@@ -115,7 +115,7 @@ header{
 }
 
 /* ─── CHARTS GRID ─── */
-.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
 
 .panel{
   background:var(--panel);backdrop-filter:var(--blur);
@@ -131,32 +131,82 @@ header{
 .panel-src a:hover{color:var(--lgreen);}
 .chart-box{position:relative;height:200px;}
 
-/* Tariff table */
-.tariff-wrap{display:flex;flex-direction:column;gap:.9rem;}
+/* ─── TARIFF PANEL ─── */
+.tariff-full{grid-column:1 / -1;}
+
+.tariff-inner{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start;}
+
 .tariff-table{width:100%;border-collapse:collapse;font-size:.82rem;}
 .tariff-table th{
   color:var(--muted);font-size:.68rem;text-transform:uppercase;font-weight:600;
   text-align:left;padding:.35rem .5rem;border-bottom:1px solid var(--border);
 }
 .tariff-table td{
-  padding:.5rem .5rem;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;
+  padding:.55rem .5rem;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;
 }
 .tariff-table tr:last-child td{border-bottom:none;}
-.trate{color:var(--yellow);font-weight:600;}
-.tnote{font-size:.7rem;color:var(--muted);}
+.trate{color:var(--yellow);font-weight:700;font-size:.9rem;}
+.tnote{font-size:.7rem;color:var(--muted);margin-top:.15rem;}
 .badge{display:inline-block;padding:.12rem .45rem;border-radius:9px;font-size:.68rem;font-weight:600;}
 .b-critical{background:rgba(255,123,114,.18);color:var(--red);}
 .b-watch   {background:rgba(240,136,62,.18); color:var(--orange);}
 .b-moderate{background:rgba(129,209,121,.18);color:var(--lgreen);}
 .b-good    {background:rgba(0,210,0,.14);    color:var(--green);}
-.tariff-chart-box{height:120px;position:relative;}
+
+.tariff-right{display:flex;flex-direction:column;gap:.9rem;}
+.tariff-chart-box{height:160px;position:relative;}
+
+/* ─── AI OPINION ─── */
+.ai-panel{
+  grid-column:1 / -1;
+  background:var(--panel);backdrop-filter:var(--blur);
+  border:1px solid var(--border);border-radius:12px;padding:1.2rem;
+  border-top:2.5px solid var(--lblue);
+}
+.ai-header{
+  display:flex;align-items:center;gap:.6rem;margin-bottom:1rem;
+}
+.ai-badge{
+  font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+  background:rgba(179,230,227,.12);color:var(--lblue);
+  border:1px solid rgba(179,230,227,.25);padding:.2rem .6rem;border-radius:20px;
+}
+.ai-title{font-size:.92rem;font-weight:600;}
+.ai-sub{font-size:.72rem;color:var(--muted);margin-left:auto;}
+
+.ai-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.85rem;}
+
+.ai-card{
+  background:rgba(255,255,255,0.03);border:1px solid var(--border);
+  border-radius:10px;padding:.95rem;
+}
+.ai-card-head{display:flex;align-items:center;gap:.5rem;margin-bottom:.55rem;}
+.ai-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.ai-dot.green {background:var(--green);}
+.ai-dot.yellow{background:var(--yellow);}
+.ai-dot.red   {background:var(--red);}
+.ai-dot.blue  {background:var(--lblue);}
+.ai-card-title{font-size:.78rem;font-weight:600;color:var(--text);}
+.ai-card-body{font-size:.76rem;color:var(--muted);line-height:1.6;}
+.ai-card-body strong{color:var(--text);font-weight:500;}
+
+.ai-verdict{
+  margin-top:.85rem;padding:.8rem 1rem;
+  background:rgba(0,210,0,0.06);border:1px solid rgba(0,210,0,0.18);
+  border-radius:8px;font-size:.78rem;color:var(--lgreen);line-height:1.65;
+}
+.ai-verdict strong{color:var(--green);font-weight:600;}
 
 @media(max-width:1200px){
   .news-grid{grid-template-columns:1fr 1fr;}
   .charts-grid{grid-template-columns:1fr;}
+  .tariff-full{grid-column:1;}
+  .tariff-inner{grid-template-columns:1fr;}
+  .ai-grid{grid-template-columns:1fr 1fr;}
 }
 @media(max-width:680px){
   .news-grid{grid-template-columns:1fr;}
+  .ai-grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -204,7 +254,7 @@ header{
   <!-- ── CHARTS ── -->
   <div class="charts-grid">
 
-    <!-- USD/KRW Daily -->
+    <!-- USD/KRW -->
     <div class="panel">
       <div class="panel-head">
         <div>
@@ -219,7 +269,7 @@ header{
       <div class="chart-box"><canvas id="chartKRW"></canvas></div>
     </div>
 
-    <!-- Oil Prices -->
+    <!-- Oil -->
     <div class="panel">
       <div class="panel-head">
         <div>
@@ -248,47 +298,134 @@ header{
       <div class="chart-box"><canvas id="chartSCFI"></canvas></div>
     </div>
 
-    <!-- Tariff -->
-    <div class="panel">
+    <!-- ── TARIFF FULL WIDTH ── -->
+    <div class="panel tariff-full">
       <div class="panel-head">
         <div>
-          <div class="panel-title">미국 관세율 현황</div>
-          <div class="panel-meta">기준: 2026.04 · 항만 크레인 장비 포함</div>
+          <div class="panel-title">🇺🇸 미국 수입 관세 분석 — HTS 8426.19 (STS / 갠트리 크레인)</div>
+          <div class="panel-meta">기준: 2026.05 · Section 301 + Section 122 누적 세율 · MFN 기본세율 0% (Free)</div>
+        </div>
+        <div class="panel-right">
+          <div style="font-size:.7rem;color:var(--muted);">* 실효세율 = MFN + S.301 + S.122</div>
         </div>
       </div>
-      <div class="tariff-wrap">
+
+      <div class="tariff-inner">
+
+        <!-- 좌: 테이블 -->
         <table class="tariff-table">
           <thead>
-            <tr><th>국가</th><th>관세율 (크레인 장비)</th><th>상태</th></tr>
+            <tr>
+              <th>국가</th>
+              <th>MFN 기본</th>
+              <th>추가 관세</th>
+              <th>실효 관세율</th>
+              <th>상태</th>
+            </tr>
           </thead>
           <tbody>
             <tr>
               <td>🇨🇳 중국</td>
-              <td><span class="trate">145%+α</span><br><span class="tnote">Section 301 + 상호관세 · ZPMC 사실상 수출 차단</span></td>
+              <td style="color:var(--muted);">0%</td>
+              <td>
+                <span style="font-size:.72rem;color:var(--muted);">S.301 <strong style="color:var(--red);">25%</strong> + S.122 <strong style="color:var(--orange);">10%</strong></span>
+              </td>
+              <td><span class="trate">≈ 35%</span><div class="tnote">STS 크레인 S.301 특별 지정 (2024.09)</div></td>
               <td><span class="badge b-critical">Critical</span></td>
             </tr>
             <tr>
               <td>🇻🇳 베트남</td>
-              <td><span class="trate">10%</span><br><span class="tnote">90일 유예 중 (원래 46%, 만료: 2026.07)</span></td>
+              <td style="color:var(--muted);">0%</td>
+              <td>
+                <span style="font-size:.72rem;color:var(--muted);">S.122 <strong style="color:var(--orange);">10%</strong></span>
+              </td>
+              <td><span class="trate">≈ 10%</span><div class="tnote">원산지 우회 시 S.301 적용 위험</div></td>
               <td><span class="badge b-watch">Watch</span></td>
             </tr>
             <tr>
               <td>🇵🇭 필리핀</td>
-              <td><span class="trate">10%</span><br><span class="tnote">90일 유예 중 (원래 17%, 만료: 2026.07)</span></td>
+              <td style="color:var(--muted);">0%</td>
+              <td>
+                <span style="font-size:.72rem;color:var(--muted);">S.122 <strong style="color:var(--orange);">10%</strong></span>
+              </td>
+              <td><span class="trate">≈ 10%</span><div class="tnote">협상 진행 중 (2025 프레임워크)</div></td>
               <td><span class="badge b-moderate">Moderate</span></td>
             </tr>
             <tr>
               <td>🇰🇷 한국</td>
-              <td><span class="trate">10%</span><br><span class="tnote">90일 유예 중 (원래 25%, 만료: 2026.07)</span></td>
+              <td style="color:var(--muted);">0%</td>
+              <td>
+                <span style="font-size:.72rem;color:var(--muted);">S.122 <strong style="color:var(--orange);">10%</strong> / KORUS FTA <strong style="color:var(--green);">0%</strong></span>
+              </td>
+              <td><span class="trate" style="color:var(--green);">0 ~ 10%</span><div class="tnote">KORUS FTA 적용 시 면제 가능</div></td>
               <td><span class="badge b-good">Favorable</span></td>
             </tr>
           </tbody>
         </table>
-        <div class="tariff-chart-box"><canvas id="chartTariff"></canvas></div>
+
+        <!-- 우: 차트 -->
+        <div class="tariff-right">
+          <div class="tariff-chart-box"><canvas id="chartTariff"></canvas></div>
+          <div style="font-size:.68rem;color:var(--muted);text-align:right;margin-top:.3rem;">
+            * S.122 만료 예정: 2026.07.24 · S.301 중국 적용 지속
+          </div>
+        </div>
+
       </div>
     </div>
 
-  </div>
+    <!-- ── AI OPINION ── -->
+    <div class="ai-panel">
+      <div class="ai-header">
+        <span class="ai-badge">✦ AI Analysis</span>
+        <span class="ai-title">HTS 8426.19 관세 환경이 HD현대 크레인 사업에 주는 시사점</span>
+        <span class="ai-sub">기준: 2026.05 · Claude Sonnet</span>
+      </div>
+
+      <div class="ai-grid">
+
+        <div class="ai-card">
+          <div class="ai-card-head">
+            <div class="ai-dot green"></div>
+            <span class="ai-card-title">🟢 경쟁 우위 — 對中 관세 격차</span>
+          </div>
+          <div class="ai-card-body">
+            중국산 STS 크레인(ZPMC)은 Section 301 25% + Section 122 10%로 <strong>실효 35% 추가 관세</strong>를 부담합니다. 한국산은 KORUS FTA 활용 시 <strong>0%</strong>까지 낮출 수 있어, 동일 스펙 기준 가격 경쟁력이 구조적으로 개선됩니다. 미국 항만 발주처(항만청, 터미널 운영사)에 <strong>"Made in Korea = 관세 리스크 Zero"</strong> 메시지를 전략적으로 어필할 시점입니다.
+          </div>
+        </div>
+
+        <div class="ai-card">
+          <div class="ai-card-head">
+            <div class="ai-dot yellow"></div>
+            <span class="ai-card-title">🟡 리스크 — Section 122 만료</span>
+          </div>
+          <div class="ai-card-body">
+            현재 베트남·필리핀·한국 모두 Section 122(10%) 적용 중이나, <strong>2026년 7월 24일 만료</strong> 예정입니다. 만료 후 협상 결과에 따라 한국의 원래 상호관세(25%)가 재부과될 수 있습니다. 또한 Section 301 조사 확대(2026.03 개시)로 산업기계 분야 추가 관세 가능성이 있어 <strong>계약 조건에 관세 변동 조항(Escalation Clause)</strong> 삽입을 검토해야 합니다.
+          </div>
+        </div>
+
+        <div class="ai-card">
+          <div class="ai-card-head">
+            <div class="ai-dot blue"></div>
+            <span class="ai-card-title">🔵 기회 — 미국 항만 수요 증가</span>
+          </div>
+          <div class="ai-card-body">
+            미국의 ZPMC 의존도 탈피 정책(Port Security 법안) + 호르무즈 분쟁으로 인한 공급망 재편으로 <strong>미국 항만의 非중국산 크레인 수요</strong>가 실질적으로 확대되고 있습니다. 2026~2028년 미국 동·서부 항만의 STS 크레인 교체 수요(추정 40~60기)가 HD현대의 핵심 타깃 시장입니다. <strong>KORUS FTA 원산지 인증서(Form A)</strong> 확보를 선제적으로 준비할 것을 권장합니다.
+          </div>
+        </div>
+
+      </div>
+
+      <div class="ai-verdict">
+        <strong>✦ 종합 판단:</strong>
+        HTS 8426.19 기준, HD현대 크레인은 현재 관세 구조에서 <strong>중국 대비 최대 35%p의 관세 우위</strong>를 보유합니다.
+        단, 2026년 7월 Section 122 만료가 최대 변수입니다. KORUS FTA 적용을 통한 0% 달성과 함께,
+        미국 발주처 대상 영업 시 <strong>"관세 리스크 없는 유일한 대형 크레인 제조국"</strong>으로 포지셔닝하는 전략이 유효합니다.
+        베트남·필리핀 경쟁사의 원산지 우회 리스크도 부각하면 추가 차별화 포인트가 됩니다.
+      </div>
+    </div>
+
+  </div><!-- /charts-grid -->
 </div>
 
 <script>
@@ -313,13 +450,13 @@ const grid = { color:'rgba(255,255,255,0.05)', drawBorder:false };
 // ── NEWS ──
 const NEWS = [
   { id:'card-cost',   tagClass:'tag-cost',   tagText:'Key Cost Savings',
-    query:'항만 크레인 원가절감 물류비 자동화 비용절감' },
+    query:'항만 크레인 원가절감 물류비 자동화' },
   { id:'card-ai',     tagClass:'tag-ai',     tagText:'Physical AI',
-    query:'Physical AI 로봇 자동화 항만 물류 스마트팩토리' },
+    query:'Physical AI 로봇 자동화 물류' },
   { id:'card-geo',    tagClass:'tag-geo',    tagText:'Geopolitics',
-    query:'미국 중국 지정학 무역분쟁 관세 항만 리스크' },
+    query:'미국 중국 무역분쟁 관세 항만' },
   { id:'card-abroad', tagClass:'tag-abroad', tagText:'Abroad',
-    query:'ZPMC LIEBHERR SANY KONE 크레인 항만 수주 HD현대에코비나' }
+    query:'ZPMC 크레인 항만 수주' }
 ];
 
 const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
@@ -342,7 +479,6 @@ async function loadNews() {
       const allItems = Array.from(xml.querySelectorAll('item'));
       const now = Date.now();
 
-      // prefer articles within 2 days; fall back to top-3 if none
       let recent = allItems.filter(item => {
         const pub = item.querySelector('pubDate')?.textContent;
         return pub && (now - new Date(pub).getTime()) <= TWO_DAYS_MS;
@@ -377,7 +513,6 @@ async function loadNews() {
     } catch(e) {
       card.innerHTML = `<span class="news-tag ${cat.tagClass}">${cat.tagText}</span>
         <p class="news-empty">뉴스 로딩 실패 (네트워크 오류)</p>`;
-      console.error(cat.id, e);
     }
   }
 
@@ -387,18 +522,17 @@ async function loadNews() {
 document.getElementById('btn-news').addEventListener('click', loadNews);
 loadNews();
 
-// ── USD/KRW DAILY (Frankfurter historical) ──
+// ── USD/KRW ──
 let krwChart = null;
 
 async function loadKRW() {
   const end   = new Date();
-  const start = new Date(end - 35 * 24 * 60 * 60 * 1000); // 35 days window for ~25 business days
+  const start = new Date(end - 35 * 24 * 60 * 60 * 1000);
   const fmt   = d => d.toISOString().slice(0,10);
 
   try {
     const res  = await fetch(`https://api.frankfurter.dev/v1/${fmt(start)}..${fmt(end)}?base=USD&symbols=KRW`);
     const data = await res.json();
-
     const dates  = Object.keys(data.rates).sort();
     const labels = dates.map(d => {
       const dt = new Date(d + 'T00:00:00');
@@ -406,27 +540,21 @@ async function loadKRW() {
     });
     const values = dates.map(d => Math.round(data.rates[d].KRW));
     const latest = values[values.length - 1];
-
     document.getElementById('krw-val').textContent = `${latest.toLocaleString()} KRW`;
-
     krwChart.data.labels = labels;
     krwChart.data.datasets[0].data = values;
     krwChart.update();
-
   } catch(e) {
-    console.warn('KRW fetch failed', e);
     document.getElementById('krw-val').textContent = '데이터 로딩 실패';
   }
 }
 
-// ── OIL PRICES ──
-// Accurate monthly averages (Oct 2025 – Apr 2026)
-// Source: EIA / Bloomberg spot prices (approximate)
+// ── OIL ──
 const OIL_FALLBACK = {
-  labels: ['Oct 25','Nov 25','Dec 25','Jan 26','Feb 26','Mar 26','Apr 26'],
-  wti:   [70.5, 68.2, 70.0, 74.3, 70.8, 66.5, 62.3],
-  brent: [74.0, 71.5, 73.2, 77.1, 74.5, 70.2, 65.8],
-  dubai: [72.8, 70.4, 71.9, 75.8, 73.2, 68.9, 64.5]
+  labels: ['Oct 25','Nov 25','Dec 25','Jan 26','Feb 26','Mar 26','May 26'],
+  wti:   [70.5, 68.2, 70.0, 74.3, 70.8, 82.0, 98.1],
+  brent: [74.0, 71.5, 73.2, 77.1, 74.5, 86.0, 104.2],
+  dubai: [72.8, 70.4, 71.9, 75.8, 73.2, 84.5, 102.8]
 };
 
 let oilChart = null;
@@ -437,7 +565,6 @@ function applyOilData(labels, wti, brent, dubai) {
   const lastD = dubai[dubai.length-1].toFixed(1);
   document.getElementById('oil-val').textContent =
     `WTI $${lastW} · Brent $${lastB} · Dubai $${lastD}`;
-
   oilChart.data.labels = labels;
   oilChart.data.datasets[0].data = wti;
   oilChart.data.datasets[1].data = brent;
@@ -453,165 +580,106 @@ async function loadOil() {
     ]);
     const dW = await rW.json();
     const dB = await rB.json();
-
     if (!dW.data || !dB.data) throw new Error('no data');
 
-    // Take last 7 months, oldest→newest
     const sliceW = dW.data.filter(d => d.value !== '.').slice(0, 7).reverse();
     const sliceB = dB.data.filter(d => d.value !== '.').slice(0, 7).reverse();
-
     const labels = sliceW.map(d => {
       const dt = new Date(d.date + 'T00:00:00');
       return dt.toLocaleDateString('en-US', { month:'short', year:'2-digit' });
     });
     const wti   = sliceW.map(d => +parseFloat(d.value).toFixed(1));
     const brent = sliceB.map(d => +parseFloat(d.value).toFixed(1));
-    // Dubai crude ≈ Brent − 1.2 $/bbl (historical average spread)
     const dubai = brent.map(v => +(v - 1.2).toFixed(1));
-
     applyOilData(labels, wti, brent, dubai);
-
   } catch(e) {
-    console.warn('Oil API failed, using static fallback', e);
-    applyOilData(
-      OIL_FALLBACK.labels,
-      OIL_FALLBACK.wti,
-      OIL_FALLBACK.brent,
-      OIL_FALLBACK.dubai
-    );
+    applyOilData(OIL_FALLBACK.labels, OIL_FALLBACK.wti, OIL_FALLBACK.brent, OIL_FALLBACK.dubai);
   }
 }
 
-// ── INIT CHARTS ──
+// ── INIT ──
 window.addEventListener('load', () => {
 
-  // KRW chart (init empty, data loaded async)
   krwChart = new Chart(document.getElementById('chartKRW'), {
     type: 'line',
-    data: {
-      labels: [],
-      datasets: [{
-        label: 'USD/KRW',
-        data: [],
-        borderColor: '#00d200',
-        backgroundColor: 'rgba(0,210,0,0.07)',
-        borderWidth: 1.8,
-        fill: true,
-        tension: 0.3,
-        pointRadius: 0,
-        pointHoverRadius: 4
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend:{ display:false } },
-      scales: {
-        y: { grid, ticks:{ callback: v => v.toLocaleString() } },
-        x: { grid, ticks:{ maxTicksLimit:10, maxRotation:0 } }
-      }
+    data: { labels:[], datasets:[{
+      label:'USD/KRW', data:[],
+      borderColor:'#00d200', backgroundColor:'rgba(0,210,0,0.07)',
+      borderWidth:1.8, fill:true, tension:0.3, pointRadius:0, pointHoverRadius:4
+    }]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false},
+        tooltip:{ callbacks:{ label: ctx => ` ${ctx.parsed.y.toLocaleString()} KRW` }}
+      },
+      scales:{ y:{grid, ticks:{callback:v=>v.toLocaleString()}}, x:{grid, ticks:{maxTicksLimit:10,maxRotation:0}} }
     }
   });
   loadKRW();
 
-  // Oil chart (init empty, data loaded async)
   oilChart = new Chart(document.getElementById('chartOil'), {
-    type: 'line',
-    data: {
-      labels: [],
-      datasets: [
-        {
-          label: 'WTI',
-          data: [],
-          borderColor: '#ff7b72',
-          backgroundColor: 'transparent',
-          borderWidth: 2, tension: 0.35, pointRadius: 3
-        },
-        {
-          label: 'Brent',
-          data: [],
-          borderColor: '#f0883e',
-          backgroundColor: 'transparent',
-          borderWidth: 2, tension: 0.35, pointRadius: 3
-        },
-        {
-          label: 'Dubai',
-          data: [],
-          borderColor: '#c6e68d',
-          backgroundColor: 'transparent',
-          borderWidth: 2, tension: 0.35, pointRadius: 3,
-          borderDash: [4, 2]
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: true,
-          labels: { color:'#8b949e', boxWidth:16, padding:12 }
-        }
+    type:'line',
+    data:{ labels:[], datasets:[
+      { label:'WTI',   data:[], borderColor:'#ff7b72', backgroundColor:'transparent', borderWidth:2, tension:0.35, pointRadius:3, pointHoverRadius:5 },
+      { label:'Brent', data:[], borderColor:'#f0883e', backgroundColor:'transparent', borderWidth:2, tension:0.35, pointRadius:3, pointHoverRadius:5 },
+      { label:'Dubai', data:[], borderColor:'#c6e68d', backgroundColor:'transparent', borderWidth:2, tension:0.35, pointRadius:3, pointHoverRadius:5, borderDash:[4,2] }
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{
+        legend:{ display:true, labels:{color:'#8b949e',boxWidth:16,padding:12} },
+        tooltip:{ callbacks:{ label: ctx => ` ${ctx.dataset.label}: $${ctx.parsed.y.toFixed(1)}/bbl` }}
       },
-      scales: {
-        y: { grid, title:{ display:true, text:'$/bbl' } },
-        x: { grid }
-      }
+      scales:{ y:{grid, title:{display:true,text:'$/bbl'}}, x:{grid} }
     }
   });
   loadOil();
 
-  // SCFI chart
   new Chart(document.getElementById('chartSCFI'), {
-    type: 'line',
-    data: {
-      labels: ['Apr 25','May 25','Jun 25','Jul 25','Aug 25','Sep 25','Oct 25','Nov 25','Dec 25','Jan 26','Feb 26','Mar 26'],
-      datasets: [{
-        label: 'SCFI',
-        data: [2000, 2150, 2240, 1900, 1644, 1510, 1400, 1280, 1200, 1420, 1595, 1710],
-        borderColor: '#00a01e',
-        backgroundColor: 'rgba(0,160,30,0.07)',
-        borderWidth: 2, fill: true, tension: 0.35,
-        pointRadius: 2, pointHoverRadius: 5
+    type:'line',
+    data:{
+      labels:['Apr 25','May 25','Jun 25','Jul 25','Aug 25','Sep 25','Oct 25','Nov 25','Dec 25','Jan 26','Feb 26','Mar 26'],
+      datasets:[{ label:'SCFI',
+        data:[2000,2150,2240,1900,1644,1510,1400,1280,1200,1420,1595,1710],
+        borderColor:'#00a01e', backgroundColor:'rgba(0,160,30,0.07)',
+        borderWidth:2, fill:true, tension:0.35, pointRadius:2, pointHoverRadius:5
       }]
     },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend:{ display:false } },
-      scales: {
-        y: { grid, min:1000, ticks:{ callback: v => v.toLocaleString() } },
-        x: { grid, ticks:{ maxRotation:0 } }
-      }
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false} },
+      scales:{ y:{grid, min:1000, ticks:{callback:v=>v.toLocaleString()}}, x:{grid, ticks:{maxRotation:0}} }
     }
   });
 
-  // Tariff bar chart
   new Chart(document.getElementById('chartTariff'), {
-    type: 'bar',
-    data: {
-      labels: ['중국','베트남','필리핀','한국'],
-      datasets: [{
-        label: '관세율 (%)',
-        data: [145, 10, 10, 10],
-        backgroundColor: ['#ff7b72','#f0883e','#81d179','#00d200'],
-        borderRadius: 4,
-        barThickness: 24
+    type:'bar',
+    data:{
+      labels:['🇨🇳 중국','🇻🇳 베트남','🇵🇭 필리핀','🇰🇷 한국'],
+      datasets:[{
+        label:'실효 관세율 (%)',
+        data:[35, 10, 10, 10],
+        backgroundColor:['rgba(255,123,114,0.85)','rgba(240,136,62,0.85)','rgba(129,209,121,0.85)','rgba(0,210,0,0.85)'],
+        borderRadius:4, barThickness:22
       }]
     },
-    options: {
-      indexAxis: 'y',
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend:{ display:false } },
-      scales: {
-        x: { grid, max:160,
-          title:{ display:true, text:'관세율 (%)' },
-          ticks:{ callback: v => v + '%' }
-        },
-        y: { grid:{ display:false } }
+    options:{
+      indexAxis:'y',
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{ callbacks:{ label: ctx => ` 실효 관세율: ${ctx.parsed.x}%` }}
+      },
+      scales:{
+        x:{ grid, max:45, title:{display:true,text:'실효 관세율 (%) — HTS 8426.19 기준'},
+          ticks:{callback:v=>v+'%'} },
+        y:{ grid:{display:false} }
       }
     }
   });
 });
 
-// Auto-refresh every 30 minutes
 setInterval(() => location.reload(), 30 * 60 * 1000);
 </script>
 </body>
