@@ -1,247 +1,239 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Port Crane Global Insights</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css">
-    <style>
-    /* ── AI PANEL ── */
-    .ai-panel {
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.09);
-        border-top: 2.5px solid #b3e6e3;
-        border-radius: 12px;
-        padding: 1.2rem;
-        margin-top: 1rem;
-    }
-    .ai-header {
-        display: flex; align-items: center; gap: .6rem;
-        margin-bottom: 1rem; flex-wrap: wrap;
-    }
-    .ai-badge {
-        font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
-        background: rgba(179,230,227,.12); color: #b3e6e3;
-        border: 1px solid rgba(179,230,227,.25);
-        padding: .2rem .6rem; border-radius: 20px;
-    }
-    .ai-title { font-size: .92rem; font-weight: 600; color: #fff; }
-    .ai-sub   { font-size: .72rem; color: #8b949e; margin-left: auto; }
-    .ai-refresh-btn {
-        background: rgba(179,230,227,0.1); color: #b3e6e3;
-        border: 1px solid rgba(179,230,227,0.25);
-        padding: .25rem .75rem; border-radius: 20px;
-        font-family: inherit; font-size: .72rem; font-weight: 500;
-        cursor: pointer; transition: background .2s;
-    }
-    .ai-refresh-btn:hover  { background: rgba(179,230,227,0.2); }
-    .ai-refresh-btn:disabled { opacity: .5; cursor: not-allowed; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Port Crane Insights</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+  --bg:      #020c1b;
+  --panel:   rgba(255,255,255,0.05);
+  --border:  rgba(255,255,255,0.09);
+  --green:   #00d200;
+  --green2:  #00a01e;
+  --lgreen:  #81d179;
+  --yellow:  #c6e68d;
+  --lblue:   #b3e6e3;
+  --red:     #ff7b72;
+  --orange:  #f0883e;
+  --text:    #ffffff;
+  --muted:   #8b949e;
+  --blur:    blur(16px);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;
+  background-image:
+    radial-gradient(ellipse at 5% 60%, rgba(0,210,0,0.04) 0%, transparent 40%),
+    radial-gradient(ellipse at 95% 15%, rgba(0,160,30,0.04) 0%, transparent 40%);
+}
+.wrap{max-width:1600px;margin:0 auto;padding:1.5rem 2rem;}
 
-    .ai-loading {
-        display: flex; align-items: center; gap: .7rem;
-        padding: 1rem; color: #8b949e; font-size: .82rem;
-    }
-    .ai-spinner {
-        width: 16px; height: 16px;
-        border: 2px solid rgba(179,230,227,0.2);
-        border-top-color: #b3e6e3;
-        border-radius: 50%; animation: spin .8s linear infinite; flex-shrink: 0;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+header{display:flex;justify-content:space-between;align-items:center;padding-bottom:1.1rem;border-bottom:1px solid var(--border);margin-bottom:1.4rem;}
+.h-title{font-size:1.75rem;font-weight:700;background:linear-gradient(90deg,#fff 55%,var(--lblue));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.h-sub{font-size:0.82rem;color:var(--muted);margin-top:0.2rem;}
+.h-right{display:flex;align-items:center;gap:0.9rem;}
+.datetime{font-size:0.82rem;color:var(--lgreen);background:rgba(129,209,121,0.1);border:1px solid rgba(129,209,121,0.22);padding:0.4rem 1rem;border-radius:20px;white-space:nowrap;}
+.btn{background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border);padding:0.4rem 1rem;border-radius:20px;font-family:inherit;font-size:0.82rem;font-weight:500;cursor:pointer;transition:background 0.2s,border-color 0.2s;}
+.btn:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.2);}
 
-    .ai-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: .85rem; }
-    .ai-card {
-        background: rgba(255,255,255,0.03);
-        border: 1px solid rgba(255,255,255,0.09);
-        border-radius: 10px; padding: .95rem;
-    }
-    .ai-card-head { display: flex; align-items: center; gap: .5rem; margin-bottom: .55rem; }
-    .ai-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .ai-dot.green  { background: #00d200; }
-    .ai-dot.yellow { background: #c6e68d; }
-    .ai-dot.blue   { background: #b3e6e3; }
-    .ai-card-title { font-size: .78rem; font-weight: 600; color: #fff; }
-    .ai-card-body  { font-size: .76rem; color: #8b949e; line-height: 1.6; }
-    .ai-verdict {
-        margin-top: .85rem; padding: .8rem 1rem;
-        background: rgba(0,210,0,0.06); border: 1px solid rgba(0,210,0,0.18);
-        border-radius: 8px; font-size: .78rem; color: #81d179; line-height: 1.65;
-    }
-    .ai-verdict strong { color: #00d200; font-weight: 600; }
-    .ai-error {
-        padding: .8rem 1rem;
-        background: rgba(255,123,114,0.08); border: 1px solid rgba(255,123,114,0.2);
-        border-radius: 8px; font-size: .78rem; color: #ff7b72;
-    }
-    @media (max-width: 900px) { .ai-grid { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 600px) { .ai-grid { grid-template-columns: 1fr; } }
-    </style>
+.section-label{font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:0.75rem;display:flex;align-items:center;gap:.6rem;}
+.section-label span{font-weight:400;text-transform:none;letter-spacing:0;color:rgba(139,148,158,0.7);}
+.news-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.4rem;}
+.news-card{background:var(--panel);backdrop-filter:var(--blur);border:1px solid var(--border);border-radius:12px;padding:1.1rem;border-top:2.5px solid;}
+.news-card:nth-child(1){border-top-color:var(--green);}
+.news-card:nth-child(2){border-top-color:var(--lgreen);}
+.news-card:nth-child(3){border-top-color:var(--yellow);}
+.news-card:nth-child(4){border-top-color:var(--lblue);}
+.news-category{display:inline-block;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:.15rem .5rem;border-radius:4px;margin-bottom:.55rem;}
+.tag-cost  {background:rgba(0,210,0,.14);   color:var(--green);}
+.tag-ai    {background:rgba(129,209,121,.14);color:var(--lgreen);}
+.tag-geo   {background:rgba(198,230,141,.14);color:var(--yellow);}
+.tag-abroad{background:rgba(179,230,227,.14);color:var(--lblue);}
+.news-links{list-style:none;}
+.news-links li{padding:.28rem 0 .28rem .9rem;position:relative;border-bottom:1px solid rgba(255,255,255,0.04);}
+.news-links li:last-child{border-bottom:none;}
+.news-links li::before{content:'·';position:absolute;left:0;top:.3rem;color:var(--muted);font-size:1.1rem;line-height:1;}
+.news-links a{color:var(--muted);text-decoration:none;font-size:0.78rem;line-height:1.35;display:block;transition:color .15s;}
+.news-links a:hover{color:var(--text);}
+
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.panel{background:var(--panel);backdrop-filter:var(--blur);border:1px solid var(--border);border-radius:12px;padding:1.2rem;}
+.panel-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.8rem;}
+.panel-title{font-size:.9rem;font-weight:600;}
+.panel-meta{font-size:.72rem;color:var(--muted);margin-top:.18rem;}
+.panel-right{text-align:right;}
+.panel-val{font-size:.88rem;font-weight:600;color:var(--lgreen);}
+.panel-src{font-size:.68rem;color:var(--muted);margin-top:.15rem;}
+.panel-src a{color:inherit;text-decoration:none;}
+.panel-src a:hover{color:var(--lgreen);}
+.chart-box{position:relative;height:200px;}
+
+/* Tariff */
+.full-width{grid-column:1 / -1;}
+.tariff-inner{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start;}
+.tariff-table{width:100%;border-collapse:collapse;font-size:.82rem;}
+.tariff-table th{color:var(--muted);font-size:.68rem;text-transform:uppercase;font-weight:600;text-align:left;padding:.35rem .5rem;border-bottom:1px solid var(--border);}
+.tariff-table td{padding:.55rem .5rem;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;}
+.tariff-table tr:last-child td{border-bottom:none;}
+.trate{color:var(--yellow);font-weight:700;font-size:.9rem;}
+.tnote{font-size:.7rem;color:var(--muted);margin-top:.15rem;}
+.badge{display:inline-block;padding:.12rem .45rem;border-radius:9px;font-size:.68rem;font-weight:600;}
+.b-critical{background:rgba(255,123,114,.18);color:var(--red);}
+.b-watch   {background:rgba(240,136,62,.18); color:var(--orange);}
+.b-moderate{background:rgba(129,209,121,.18);color:var(--lgreen);}
+.b-good    {background:rgba(0,210,0,.14);    color:var(--green);}
+.tariff-chart-box{height:160px;position:relative;}
+
+/* AI Panel */
+.ai-panel{
+  grid-column:1 / -1;
+  background:var(--panel);backdrop-filter:var(--blur);
+  border:1px solid var(--border);border-radius:12px;padding:1.2rem;
+  border-top:2.5px solid var(--lblue);margin-top:0;
+}
+.ai-header{display:flex;align-items:center;gap:.6rem;margin-bottom:1rem;flex-wrap:wrap;}
+.ai-badge{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:rgba(179,230,227,.12);color:var(--lblue);border:1px solid rgba(179,230,227,.25);padding:.2rem .6rem;border-radius:20px;}
+.ai-title{font-size:.92rem;font-weight:600;}
+.ai-timestamp{font-size:.72rem;color:var(--muted);margin-left:auto;}
+.ai-rerun-btn{background:rgba(179,230,227,0.1);color:var(--lblue);border:1px solid rgba(179,230,227,0.25);padding:.25rem .75rem;border-radius:20px;font-family:inherit;font-size:.72rem;cursor:pointer;transition:background .2s;}
+.ai-rerun-btn:hover{background:rgba(179,230,227,0.2);}
+
+@keyframes spin{to{transform:rotate(360deg);}}
+
+@media(max-width:1200px){
+  .news-grid{grid-template-columns:1fr 1fr;}
+  .charts-grid{grid-template-columns:1fr;}
+  .full-width{grid-column:1;}
+  .tariff-inner{grid-template-columns:1fr;}
+}
+@media(max-width:680px){.news-grid{grid-template-columns:1fr;}}
+</style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <!-- Header -->
-        <header class="dashboard-header">
-            <div class="header-content">
-                <h1>Port Crane Global Insights</h1>
-                <p>Real-time analytics & industry trends for port logistics and automation</p>
-            </div>
-            <div class="header-controls">
-                <div class="datetime-display" id="current-time"></div>
-                <button id="refresh-btn" class="refresh-btn">🔄 Data Refresh</button>
-            </div>
-        </header>
+<div class="wrap">
 
-        <!-- Main Grid -->
-        <main class="dashboard-grid">
+  <header>
+    <div>
+      <div class="h-title">Port Crane Global Insights</div>
+      <div class="h-sub">HD Hyundai · Real-time market intelligence for port crane business</div>
+    </div>
+    <div class="h-right">
+      <div class="datetime" id="current-time">--</div>
+      <button class="btn" id="refresh-btn">⟳ Refresh All</button>
+    </div>
+  </header>
 
-            <!-- Left Column -->
-            <div class="column column-left">
+  <div class="section-label">
+    Industry News <span>최근 뉴스</span>
+    <button class="btn" id="refresh-news-btn" style="margin-left:auto;font-size:.72rem;padding:.2rem .7rem;">🔄 News Refresh</button>
+  </div>
 
-                <!-- News -->
-                <div class="widget news-widget glass-panel">
-                    <div class="widget-header" style="display:flex;justify-content:space-between;align-items:center;">
-                        <h2>📰 Weekly Industry Briefing</h2>
-                        <button id="refresh-news-btn" class="refresh-btn" style="padding:.3rem .8rem;font-size:.75rem;">🔄 News Refresh</button>
-                    </div>
-                    <div class="widget-content">
-                        <div class="news-item" id="news-cost">
-                            <span class="news-category tag-cost">Key Cost Savings</span>
-                            <h3>[요약] 로딩 중...</h3>
-                            <ul class="news-links"></ul>
-                        </div>
-                        <div class="news-item" id="news-ai">
-                            <span class="news-category tag-ai">Physical AI</span>
-                            <h3>[요약] 로딩 중...</h3>
-                            <ul class="news-links"></ul>
-                        </div>
-                        <div class="news-item" id="news-geo">
-                            <span class="news-category tag-geo">Geopolitics</span>
-                            <h3>[요약] 로딩 중...</h3>
-                            <ul class="news-links"></ul>
-                        </div>
-                        <div class="news-item" id="news-abroad">
-                            <span class="news-category tag-abroad">Abroad</span>
-                            <h3>[요약] 로딩 중...</h3>
-                            <ul class="news-links"></ul>
-                        </div>
-                    </div>
-                </div>
+  <div class="news-grid">
+    <div class="news-card" id="news-cost"><span class="news-category tag-cost">Key Cost Savings</span><p style="font-size:.8rem;color:var(--muted);">로딩 중...</p></div>
+    <div class="news-card" id="news-ai"><span class="news-category tag-ai">Physical AI</span><p style="font-size:.8rem;color:var(--muted);">로딩 중...</p></div>
+    <div class="news-card" id="news-geo"><span class="news-category tag-geo">Geopolitics</span><p style="font-size:.8rem;color:var(--muted);">로딩 중...</p></div>
+    <div class="news-card" id="news-abroad"><span class="news-category tag-abroad">Abroad</span><p style="font-size:.8rem;color:var(--muted);">로딩 중...</p></div>
+  </div>
 
-                <!-- SCFI -->
-                <div class="widget chart-widget glass-panel">
-                    <div class="widget-header">
-                        <h2>🚢 SCFI Container Freight Index (1Y)</h2>
-                        <span class="subtitle">Shanghai Containerized Freight Index</span>
-                    </div>
-                    <div class="chart-container"><canvas id="scfiChart"></canvas></div>
-                    <div class="chart-source">
-                        <a href="https://www.sse.net.cn/index/singleIndex?indexType=scfi" target="_blank">Source: Shanghai Shipping Exchange</a>
-                    </div>
-                </div>
-            </div>
+  <div class="charts-grid">
 
-            <!-- Right Column -->
-            <div class="column column-right">
-
-                <!-- Exchange Rate -->
-                <div class="widget chart-widget glass-panel">
-                    <div class="widget-header">
-                        <h2>💵 USD/KRW Exchange Rate (6M)</h2>
-                        <span class="subtitle" id="exchange-rate-subtitle">Current Rate: Loading...</span>
-                    </div>
-                    <div class="chart-container"><canvas id="exchangeRateChart"></canvas></div>
-                    <div class="chart-source">
-                        <a href="https://finance.yahoo.com/quote/KRW=X/history/" target="_blank">Source: Yahoo Finance Data</a>
-                    </div>
-                </div>
-
-                <!-- Oil -->
-                <div class="widget chart-widget glass-panel">
-                    <div class="widget-header">
-                        <h2>🛢️ Crude Oil Prices (6M)</h2>
-                        <span class="subtitle">WTI · Brent · Dubai ($/bbl) &nbsp;|&nbsp; <span id="oil-price-subtitle">로딩 중...</span></span>
-                    </div>
-                    <div class="chart-container"><canvas id="oilPriceChart"></canvas></div>
-                    <div class="chart-source">
-                        <a href="https://tradingeconomics.com/commodity/crude-oil" target="_blank">Source: Trading Economics</a>
-                    </div>
-                </div>
-
-                <!-- Tariff — HTS 8426.19 기준으로 업데이트 -->
-                <div class="widget tariff-widget glass-panel">
-                    <div class="widget-header">
-                        <h2>🇺🇸 US Tariff Tracker — HTS 8426.19</h2>
-                        <span class="subtitle">STS &amp; 갠트리 크레인 · 실효세율 = MFN + S.301 + S.122 · 기준: 2026.05</span>
-                    </div>
-                    <div class="chart-container" style="height:180px;margin-bottom:1rem;">
-                        <canvas id="tariffChart"></canvas>
-                    </div>
-                    <div class="widget-content">
-                        <table class="tariff-table">
-                            <thead>
-                                <tr>
-                                    <th>Country</th>
-                                    <th>실효 관세율</th>
-                                    <th>근거</th>
-                                    <th>Impact</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><span class="flag">🇨🇳</span> China</td>
-                                    <td><strong style="color:#ff7b72;">≈ 35%</strong></td>
-                                    <td style="font-size:.75rem;color:#8b949e;">S.301 25% + S.122 10%<br>STS 크레인 특별 지정 (2024.09)</td>
-                                    <td><span class="impact-badge high">Critical</span></td>
-                                </tr>
-                                <tr>
-                                    <td><span class="flag">🇻🇳</span> Vietnam</td>
-                                    <td><strong style="color:#f0883e;">≈ 10%</strong></td>
-                                    <td style="font-size:.75rem;color:#8b949e;">S.122 10%<br>원산지 우회 시 S.301 위험</td>
-                                    <td><span class="impact-badge medium">Watch</span></td>
-                                </tr>
-                                <tr>
-                                    <td><span class="flag">🇵🇭</span> Philippines</td>
-                                    <td><strong style="color:#81d179;">≈ 10%</strong></td>
-                                    <td style="font-size:.75rem;color:#8b949e;">S.122 10%<br>협상 진행 중</td>
-                                    <td><span class="impact-badge low">Moderate</span></td>
-                                </tr>
-                                <tr>
-                                    <td><span class="flag">🇰🇷</span> South Korea</td>
-                                    <td><strong style="color:#00d200;">0 ~ 10%</strong></td>
-                                    <td style="font-size:.75rem;color:#8b949e;">KORUS FTA 시 0%<br>S.122 만료 시 재협상</td>
-                                    <td><span class="impact-badge low">Favorable</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div style="font-size:.68rem;color:#8b949e;margin-top:.6rem;text-align:right;">
-                            * S.122 만료 예정: 2026.07.24 &nbsp;·&nbsp; MFN 기본세율 0% (Free)
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </main>
-
-        <!-- AI PANEL — 전체 너비 -->
-        <div class="ai-panel">
-            <div class="ai-header">
-                <span class="ai-badge">✦ Gemini AI Analysis</span>
-                <span class="ai-title">HTS 8426.19 관세 환경 — 실시간 AI 분석</span>
-                <span class="ai-sub" id="ai-timestamp"></span>
-                <button class="ai-refresh-btn" id="btn-ai-refresh" onclick="runGeminiAnalysis()">▶ 재분석</button>
-            </div>
-            <div id="ai-output">
-                <div class="ai-loading">
-                    <div class="ai-spinner"></div>
-                    분석 준비 중...
-                </div>
-            </div>
+    <div class="panel">
+      <div class="panel-head">
+        <div><div class="panel-title">💱 USD / KRW 환율</div><div class="panel-meta">Frankfurter API · 실시간</div></div>
+        <div class="panel-right">
+          <div class="panel-val" id="exchange-rate-subtitle">--</div>
+          <div class="panel-src"><a href="https://www.frankfurter.app" target="_blank">frankfurter.app</a></div>
         </div>
-
+      </div>
+      <div class="chart-box"><canvas id="exchangeRateChart"></canvas></div>
     </div>
 
-    <script src="app.js"></script>
+    <div class="panel">
+      <div class="panel-head">
+        <div><div class="panel-title">🛢 국제 유가 — WTI · Brent · Dubai</div><div class="panel-meta">월평균 ($/bbl)</div></div>
+        <div class="panel-right">
+          <div class="panel-val" id="oil-price-subtitle">--</div>
+          <div class="panel-src"><a href="https://www.eia.gov" target="_blank">eia.gov</a></div>
+        </div>
+      </div>
+      <div class="chart-box"><canvas id="oilPriceChart"></canvas></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div><div class="panel-title">📦 SCFI 컨테이너 운임 지수 (1Y)</div><div class="panel-meta">Shanghai Containerized Freight Index</div></div>
+      </div>
+      <div class="chart-box"><canvas id="scfiChart"></canvas></div>
+    </div>
+
+    <!-- TARIFF -->
+    <div class="panel full-width">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">🇺🇸 미국 수입 관세 분석 — HTS 8426.19 (STS / 갠트리 크레인)</div>
+          <div class="panel-meta">기준: 2026.05 · Section 301 + Section 122 누적 세율 · MFN 기본세율 0%</div>
+        </div>
+        <div class="panel-right"><div style="font-size:.7rem;color:var(--muted);">실효세율 = MFN + S.301 + S.122</div></div>
+      </div>
+      <div class="tariff-inner">
+        <table class="tariff-table">
+          <thead><tr><th>국가</th><th>MFN 기본</th><th>추가 관세</th><th>실효 관세율</th><th>상태</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>🇨🇳 중국</td>
+              <td style="color:var(--muted);">0%</td>
+              <td><span style="font-size:.72rem;color:var(--muted);">S.301 <strong style="color:var(--red);">25%</strong> + S.122 <strong style="color:var(--orange);">10%</strong></span></td>
+              <td><span class="trate">≈ 35%</span><div class="tnote">STS 크레인 S.301 특별 지정 (2024.09)</div></td>
+              <td><span class="badge b-critical">Critical</span></td>
+            </tr>
+            <tr>
+              <td>🇻🇳 베트남</td>
+              <td style="color:var(--muted);">0%</td>
+              <td><span style="font-size:.72rem;color:var(--muted);">S.122 <strong style="color:var(--orange);">10%</strong></span></td>
+              <td><span class="trate">≈ 10%</span><div class="tnote">원산지 우회 시 S.301 적용 위험</div></td>
+              <td><span class="badge b-watch">Watch</span></td>
+            </tr>
+            <tr>
+              <td>🇵🇭 필리핀</td>
+              <td style="color:var(--muted);">0%</td>
+              <td><span style="font-size:.72rem;color:var(--muted);">S.122 <strong style="color:var(--orange);">10%</strong></span></td>
+              <td><span class="trate">≈ 10%</span><div class="tnote">협상 진행 중 (2025 프레임워크)</div></td>
+              <td><span class="badge b-moderate">Moderate</span></td>
+            </tr>
+            <tr>
+              <td>🇰🇷 한국</td>
+              <td style="color:var(--muted);">0%</td>
+              <td><span style="font-size:.72rem;color:var(--muted);">S.122 <strong style="color:var(--orange);">10%</strong> / KORUS FTA <strong style="color:var(--green);">0%</strong></span></td>
+              <td><span class="trate" style="color:var(--green);">0 ~ 10%</span><div class="tnote">KORUS FTA 적용 시 면제 가능</div></td>
+              <td><span class="badge b-good">Favorable</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div>
+          <div class="tariff-chart-box"><canvas id="tariffChart"></canvas></div>
+          <div style="font-size:.68rem;color:var(--muted);text-align:right;margin-top:.3rem;">* S.122 만료 예정: 2026.07.24</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI ANALYSIS -->
+    <div class="ai-panel">
+      <div class="ai-header">
+        <span class="ai-badge">✦ Gemini AI Analysis</span>
+        <span class="ai-title">HTS 8426.19 관세 환경 — 실시간 AI 분석</span>
+        <span class="ai-timestamp" id="ai-analysis-timestamp"></span>
+        <button class="ai-rerun-btn" onclick="runGeminiAnalysis()">↺ 재분석</button>
+      </div>
+      <div id="ai-analysis-output">
+        <div style="font-size:.8rem;color:var(--muted);padding:.5rem 0;">페이지 로드 후 자동 분석이 시작됩니다...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<script src="app.js"></script>
 </body>
 </html>
