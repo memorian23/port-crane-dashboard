@@ -4,11 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Port Crane Global Insights</title>
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
+    <style>
+    /* ── AI PANEL ── */
+    .ai-panel {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.09);
+        border-top: 2.5px solid #b3e6e3;
+        border-radius: 12px;
+        padding: 1.2rem;
+        margin-top: 1rem;
+    }
+    .ai-header {
+        display: flex; align-items: center; gap: .6rem;
+        margin-bottom: 1rem; flex-wrap: wrap;
+    }
+    .ai-badge {
+        font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+        background: rgba(179,230,227,.12); color: #b3e6e3;
+        border: 1px solid rgba(179,230,227,.25);
+        padding: .2rem .6rem; border-radius: 20px;
+    }
+    .ai-title { font-size: .92rem; font-weight: 600; color: #fff; }
+    .ai-sub   { font-size: .72rem; color: #8b949e; margin-left: auto; }
+    .ai-refresh-btn {
+        background: rgba(179,230,227,0.1); color: #b3e6e3;
+        border: 1px solid rgba(179,230,227,0.25);
+        padding: .25rem .75rem; border-radius: 20px;
+        font-family: inherit; font-size: .72rem; font-weight: 500;
+        cursor: pointer; transition: background .2s;
+    }
+    .ai-refresh-btn:hover  { background: rgba(179,230,227,0.2); }
+    .ai-refresh-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    .ai-loading {
+        display: flex; align-items: center; gap: .7rem;
+        padding: 1rem; color: #8b949e; font-size: .82rem;
+    }
+    .ai-spinner {
+        width: 16px; height: 16px;
+        border: 2px solid rgba(179,230,227,0.2);
+        border-top-color: #b3e6e3;
+        border-radius: 50%; animation: spin .8s linear infinite; flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .ai-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: .85rem; }
+    .ai-card {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.09);
+        border-radius: 10px; padding: .95rem;
+    }
+    .ai-card-head { display: flex; align-items: center; gap: .5rem; margin-bottom: .55rem; }
+    .ai-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .ai-dot.green  { background: #00d200; }
+    .ai-dot.yellow { background: #c6e68d; }
+    .ai-dot.blue   { background: #b3e6e3; }
+    .ai-card-title { font-size: .78rem; font-weight: 600; color: #fff; }
+    .ai-card-body  { font-size: .76rem; color: #8b949e; line-height: 1.6; }
+    .ai-verdict {
+        margin-top: .85rem; padding: .8rem 1rem;
+        background: rgba(0,210,0,0.06); border: 1px solid rgba(0,210,0,0.18);
+        border-radius: 8px; font-size: .78rem; color: #81d179; line-height: 1.65;
+    }
+    .ai-verdict strong { color: #00d200; font-weight: 600; }
+    .ai-error {
+        padding: .8rem 1rem;
+        background: rgba(255,123,114,0.08); border: 1px solid rgba(255,123,114,0.2);
+        border-radius: 8px; font-size: .78rem; color: #ff7b72;
+    }
+    @media (max-width: 900px) { .ai-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 600px) { .ai-grid { grid-template-columns: 1fr; } }
+    </style>
 </head>
 <body>
     <div class="dashboard-container">
@@ -26,95 +95,87 @@
 
         <!-- Main Grid -->
         <main class="dashboard-grid">
-            
-            <!-- Left Column: News & Key Metrics -->
+
+            <!-- Left Column -->
             <div class="column column-left">
-                <!-- Section 1: News Summaries -->
+
+                <!-- News -->
                 <div class="widget news-widget glass-panel">
-                    <div class="widget-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="widget-header" style="display:flex;justify-content:space-between;align-items:center;">
                         <h2>📰 Weekly Industry Briefing</h2>
-                        <button id="refresh-news-btn" class="refresh-btn" style="padding: 0.3rem 0.8rem; font-size: 0.75rem;">🔄 News Refresh</button>
+                        <button id="refresh-news-btn" class="refresh-btn" style="padding:.3rem .8rem;font-size:.75rem;">🔄 News Refresh</button>
                     </div>
                     <div class="widget-content">
                         <div class="news-item" id="news-cost">
                             <span class="news-category tag-cost">Key Cost Savings</span>
                             <h3>[요약] 로딩 중...</h3>
-                            <ul class="news-links">
-                            </ul>
+                            <ul class="news-links"></ul>
                         </div>
                         <div class="news-item" id="news-ai">
                             <span class="news-category tag-ai">Physical AI</span>
                             <h3>[요약] 로딩 중...</h3>
-                            <ul class="news-links">
-                            </ul>
+                            <ul class="news-links"></ul>
                         </div>
                         <div class="news-item" id="news-geo">
                             <span class="news-category tag-geo">Geopolitics</span>
                             <h3>[요약] 로딩 중...</h3>
-                            <ul class="news-links">
-                            </ul>
+                            <ul class="news-links"></ul>
                         </div>
                         <div class="news-item" id="news-abroad">
                             <span class="news-category tag-abroad">Abroad</span>
                             <h3>[요약] 로딩 중...</h3>
-                            <ul class="news-links">
-                            </ul>
+                            <ul class="news-links"></ul>
                         </div>
                     </div>
                 </div>
 
-                <!-- Section 4: SCFI Index -->
+                <!-- SCFI -->
                 <div class="widget chart-widget glass-panel">
                     <div class="widget-header">
                         <h2>🚢 SCFI Container Freight Index (1Y)</h2>
                         <span class="subtitle">Shanghai Containerized Freight Index</span>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="scfiChart"></canvas>
-                    </div>
+                    <div class="chart-container"><canvas id="scfiChart"></canvas></div>
                     <div class="chart-source">
                         <a href="https://www.sse.net.cn/index/singleIndex?indexType=scfi" target="_blank">Source: Shanghai Shipping Exchange</a>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: Charts -->
+            <!-- Right Column -->
             <div class="column column-right">
-                <!-- Section 2: Exchange Rate -->
+
+                <!-- Exchange Rate -->
                 <div class="widget chart-widget glass-panel">
                     <div class="widget-header">
                         <h2>💵 USD/KRW Exchange Rate (6M)</h2>
                         <span class="subtitle" id="exchange-rate-subtitle">Current Rate: Loading...</span>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="exchangeRateChart"></canvas>
-                    </div>
+                    <div class="chart-container"><canvas id="exchangeRateChart"></canvas></div>
                     <div class="chart-source">
                         <a href="https://finance.yahoo.com/quote/KRW=X/history/" target="_blank">Source: Yahoo Finance Data</a>
                     </div>
                 </div>
 
-                <!-- Section 3: Oil Price (WTI / Brent / Dubai) -->
+                <!-- Oil -->
                 <div class="widget chart-widget glass-panel">
                     <div class="widget-header">
                         <h2>🛢️ Crude Oil Prices (6M)</h2>
                         <span class="subtitle">WTI · Brent · Dubai ($/bbl) &nbsp;|&nbsp; <span id="oil-price-subtitle">로딩 중...</span></span>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="oilPriceChart"></canvas>
-                    </div>
+                    <div class="chart-container"><canvas id="oilPriceChart"></canvas></div>
                     <div class="chart-source">
                         <a href="https://tradingeconomics.com/commodity/crude-oil" target="_blank">Source: Trading Economics</a>
                     </div>
                 </div>
 
-                <!-- Section 4: US Tariff Tracker -->
+                <!-- Tariff — HTS 8426.19 기준으로 업데이트 -->
                 <div class="widget tariff-widget glass-panel">
                     <div class="widget-header">
-                        <h2>🇺🇸 US Tariff Tracker (Port Cranes)</h2>
-                        <span class="subtitle">Expected 2026 Tariffs on STS & RTGC</span>
+                        <h2>🇺🇸 US Tariff Tracker — HTS 8426.19</h2>
+                        <span class="subtitle">STS &amp; 갠트리 크레인 · 실효세율 = MFN + S.301 + S.122 · 기준: 2026.05</span>
                     </div>
-                    <div class="chart-container" style="height: 200px; margin-bottom: 1rem;">
+                    <div class="chart-container" style="height:180px;margin-bottom:1rem;">
                         <canvas id="tariffChart"></canvas>
                     </div>
                     <div class="widget-content">
@@ -122,40 +183,65 @@
                             <thead>
                                 <tr>
                                     <th>Country</th>
-                                    <th>Status / Tariff Policy</th>
-                                    <th>Impact Level</th>
+                                    <th>실효 관세율</th>
+                                    <th>근거</th>
+                                    <th>Impact</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td><span class="flag">🇨🇳</span> China</td>
-                                    <td><b>100% ~ 270%</b> (Security ban)</td>
+                                    <td><strong style="color:#ff7b72;">≈ 35%</strong></td>
+                                    <td style="font-size:.75rem;color:#8b949e;">S.301 25% + S.122 10%<br>STS 크레인 특별 지정 (2024.09)</td>
                                     <td><span class="impact-badge high">Critical</span></td>
                                 </tr>
                                 <tr>
                                     <td><span class="flag">🇻🇳</span> Vietnam</td>
-                                    <td><b>10% Range</b> (Investigation)</td>
+                                    <td><strong style="color:#f0883e;">≈ 10%</strong></td>
+                                    <td style="font-size:.75rem;color:#8b949e;">S.122 10%<br>원산지 우회 시 S.301 위험</td>
                                     <td><span class="impact-badge medium">Watch</span></td>
                                 </tr>
                                 <tr>
                                     <td><span class="flag">🇵🇭</span> Philippines</td>
-                                    <td><b>~19%</b> (Trade tension)</td>
+                                    <td><strong style="color:#81d179;">≈ 10%</strong></td>
+                                    <td style="font-size:.75rem;color:#8b949e;">S.122 10%<br>협상 진행 중</td>
                                     <td><span class="impact-badge low">Moderate</span></td>
                                 </tr>
                                 <tr>
                                     <td><span class="flag">🇰🇷</span> South Korea</td>
-                                    <td><b>0%</b> (Favorable, US Ally)</td>
+                                    <td><strong style="color:#00d200;">0 ~ 10%</strong></td>
+                                    <td style="font-size:.75rem;color:#8b949e;">KORUS FTA 시 0%<br>S.122 만료 시 재협상</td>
                                     <td><span class="impact-badge low">Favorable</span></td>
                                 </tr>
                             </tbody>
                         </table>
+                        <div style="font-size:.68rem;color:#8b949e;margin-top:.6rem;text-align:right;">
+                            * S.122 만료 예정: 2026.07.24 &nbsp;·&nbsp; MFN 기본세율 0% (Free)
+                        </div>
                     </div>
                 </div>
+
             </div>
         </main>
+
+        <!-- AI PANEL — 전체 너비 -->
+        <div class="ai-panel">
+            <div class="ai-header">
+                <span class="ai-badge">✦ Gemini AI Analysis</span>
+                <span class="ai-title">HTS 8426.19 관세 환경 — 실시간 AI 분석</span>
+                <span class="ai-sub" id="ai-timestamp"></span>
+                <button class="ai-refresh-btn" id="btn-ai-refresh" onclick="runGeminiAnalysis()">▶ 재분석</button>
+            </div>
+            <div id="ai-output">
+                <div class="ai-loading">
+                    <div class="ai-spinner"></div>
+                    분석 준비 중...
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Scripts -->
     <script src="app.js"></script>
 </body>
 </html>
