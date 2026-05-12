@@ -14,7 +14,6 @@ updateTime();
 const REFRESH_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
 
 document.getElementById('refresh-btn').addEventListener('click', () => {
-    // Reloads the page to fetch the latest "current time" and renew content
     location.reload();
 });
 
@@ -52,24 +51,19 @@ async function updateNews() {
                 const container = document.getElementById(cat.id);
                 if (!container) continue;
 
-                // Create a 1-line pseudo summary based on the first returned article
                 const firstTitle = items[0].querySelector("title").textContent.split(' - ')[0]; 
                 const summaryText = `[최신 동향] ${firstTitle} 등 관련 주요 소식`;
 
                 let linksHtml = '<ul class="news-links">';
                 items.forEach(item => {
                     let title = item.querySelector("title").textContent;
-                    // Clean up publisher names that usually follow a dash " - "
                     title = title.split(' - ')[0].trim();
-                     // Limit title length to prevent extremely long links breaking layout
                     if(title.length > 60) title = title.substring(0, 60) + '...';
-                    
                     const link = item.querySelector("link").textContent;
                     linksHtml += `<li><a href="${link}" target="_blank">${title}</a></li>`;
                 });
                 linksHtml += '</ul>';
 
-                // Re-render the widget HTML
                 container.innerHTML = `
                     <span class="news-category ${cat.tagClass}">${cat.tagText}</span>
                     <h3>${summaryText}</h3>
@@ -84,9 +78,7 @@ async function updateNews() {
     if (btn) btn.innerText = '🔄 News Refresh';
 }
 
-// Bind button and fetch initially
 document.getElementById('refresh-news-btn')?.addEventListener('click', updateNews);
-// Also fetch immediately on load so we get live data instead of static placeholders over time
 updateNews();
 
 // Chart Theme Configuration
@@ -99,65 +91,56 @@ const gridConfig = {
 
 // --- DATA DEFINITIONS ---
 
-// 1. Exchange Rate Data Setup
+// 1. Exchange Rate
 const todayChart = new Date();
 const todayLabel = todayChart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' (Today)';
 
-// Initial chart data (the last point is a placeholder that will be updated)
 let krwChartInstance = null;
 const krwData = {
     labels: ['Sep 25', 'Oct 25', 'Nov 25', 'Dec 25', 'Jan 26', 'Feb 26', todayLabel],
     datasets: [{
         label: 'USD to KRW',
-        data: [1379, 1420, 1475, 1470, 1450, 1465, 1488], // Default fallback
-        borderColor: '#00d200', /* Green-1 */
+        data: [1379, 1420, 1475, 1470, 1450, 1465, 1488],
+        borderColor: '#00d200',
         backgroundColor: 'rgba(0, 210, 0, 0.1)',
         borderWidth: 2,
         fill: true,
         tension: 0.4,
-        pointBackgroundColor: '#001a66', /* Background Color */
+        pointBackgroundColor: '#001a66',
         pointBorderColor: '#00d200',
         pointHoverRadius: 6
     }]
 };
 
-// Function to fetch real-time USD/KRW exchange rate
 async function fetchRealExchangeRate() {
     try {
-        // Using Frankfurter API (Free, no key needed for basic usage, supports USD/KRW)
-        // Note: Free APIs might have latency or limit pairs, fallback is 1488 (Current user context)
         const response = await fetch('https://api.frankfurter.dev/v1/latest?base=USD&symbols=KRW');
         const data = await response.json();
-        
         if (data && data.rates && data.rates.KRW) {
-            const currentRate = Math.round(data.rates.KRW);
-            updateExchangeRateUI(currentRate);
+            updateExchangeRateUI(Math.round(data.rates.KRW));
         } else {
             throw new Error("Invalid API Response");
         }
     } catch (error) {
         console.warn("Could not fetch live exchange rate. Using fallback.", error);
-        // Fallback to the latest known accurate rate (1488 KRW)
         updateExchangeRateUI(1488);
     }
 }
 
 function updateExchangeRateUI(rate) {
-    // 1. Update the subtitle
     const subtitleEl = document.getElementById('exchange-rate-subtitle');
     if (subtitleEl) {
         subtitleEl.innerText = `Current Rate: ${rate.toLocaleString()} KRW (Today)`;
     }
-
-    // 2. Update the chart's last data point
     if (krwChartInstance) {
         const dataArray = krwChartInstance.data.datasets[0].data;
-        dataArray[dataArray.length - 1] = rate; // Update the last item
+        dataArray[dataArray.length - 1] = rate;
         krwChartInstance.update();
     }
 }
 
-// 2. Crude Oil Prices – WTI / Brent / Dubai (Past 6 Months)
+// 2. Crude Oil Prices – WTI / Brent / Dubai (fallback data)
+let oilChartInstance = null;
 const oilPriceData = {
     labels: ['Oct 25', 'Nov 25', 'Dec 25', 'Jan 26', 'Feb 26', 'Mar 26', 'Apr 26'],
     datasets: [
@@ -194,20 +177,75 @@ const oilPriceData = {
     ]
 };
 
-function updateOilSubtitle() {
-    const el = document.getElementById('oil-price-subtitle');
-    if (!el) return;
-    const last = oilPriceData.datasets.map(ds => `${ds.label.split(' ')[0]} $${ds.data[ds.data.length - 1]}`);
-    el.innerText = last.join(' · ');
+// 실시간 유가 fetch (Yahoo Finance → allorigins 프록시)
+async function fetchRealOilPrices() {
+    let wti = null, brent = null;
+
+    // WTI (CL=F)
+    try {
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/CL%3DF?interval=1d&range=1d')}`;
+        const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(6000) });
+        const json = await res.json();
+        const parsed = JSON.parse(json.contents);
+        wti = parsed?.chart?.result?.[0]?.meta?.regularMarketPrice;
+    } catch (e) {
+        console.warn('[Oil] WTI fetch failed:', e.message);
+    }
+
+    // Brent (BZ=F)
+    try {
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/BZ%3DF?interval=1d&range=1d')}`;
+        const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(6000) });
+        const json = await res.json();
+        const parsed = JSON.parse(json.contents);
+        brent = parsed?.chart?.result?.[0]?.meta?.regularMarketPrice;
+    } catch (e) {
+        console.warn('[Oil] Brent fetch failed:', e.message);
+    }
+
+    if (wti && brent && wti > 20 && wti < 200) {
+        const dubai = parseFloat((brent - 1.4).toFixed(1));
+        wti = parseFloat(wti.toFixed(1));
+        brent = parseFloat(brent.toFixed(1));
+
+        // 차트 마지막 데이터포인트(오늘)를 실시간 값으로 교체
+        if (oilChartInstance) {
+            const ds = oilChartInstance.data.datasets;
+            const lastIdx = ds[0].data.length - 1;
+            ds[0].data[lastIdx] = wti;
+            ds[1].data[lastIdx] = brent;
+            ds[2].data[lastIdx] = dubai;
+            oilChartInstance.update();
+        }
+
+        updateOilSubtitle(wti, brent, dubai, true);
+        console.log(`[Oil] Live — WTI: $${wti}, Brent: $${brent}, Dubai: $${dubai}`);
+    } else {
+        console.warn('[Oil] Invalid data. Using fallback.');
+        const ds = oilPriceData.datasets;
+        updateOilSubtitle(
+            ds[0].data[ds[0].data.length - 1],
+            ds[1].data[ds[1].data.length - 1],
+            ds[2].data[ds[2].data.length - 1],
+            false
+        );
+    }
 }
 
-// 3. SCFI Index (Past 1 Year)
+function updateOilSubtitle(wti, brent, dubai, isLive) {
+    const el = document.getElementById('oil-price-subtitle');
+    if (!el) return;
+    const tag = isLive ? ' (live)' : ' (cached)';
+    el.innerText = `WTI $${wti} · Brent $${brent} · Dubai $${dubai}${tag}`;
+}
+
+// 3. SCFI Index
 const scfiData = {
     labels: ['Apr 25', 'Jun 25', 'Aug 25', 'Oct 25', 'Dec 25', 'Feb 26', 'Mar 26'],
     datasets: [{
         label: 'SCFI Index Value',
         data: [2000, 2240, 1644, 1400, 1200, 1595, 1710],
-        borderColor: '#00a01e', /* Green-2 */
+        borderColor: '#00a01e',
         borderWidth: 2,
         tension: 0.3,
         pointRadius: 4,
@@ -221,12 +259,7 @@ const tariffData = {
     datasets: [{
         label: 'Expected Tariff (%)',
         data: [100, 10, 19, 0],
-        backgroundColor: [
-            '#ff7b72', // Critical
-            '#f0883e', // Watch
-            '#81d179', // Moderate
-            '#00d200'  // Favorable
-        ],
+        backgroundColor: ['#ff7b72', '#f0883e', '#81d179', '#00d200'],
         borderRadius: 4
     }]
 };
@@ -235,7 +268,7 @@ const tariffData = {
 // --- INITIALIZE CHARTS ---
 
 window.onload = function() {
-    
+
     // Exchange Rate Chart
     krwChartInstance = new Chart(document.getElementById('exchangeRateChart').getContext('2d'), {
         type: 'line',
@@ -251,8 +284,8 @@ window.onload = function() {
         }
     });
 
-    // Oil Price Chart (WTI / Brent / Dubai)
-    new Chart(document.getElementById('oilPriceChart').getContext('2d'), {
+    // Oil Price Chart (WTI / Brent / Dubai) — 실시간 연동
+    oilChartInstance = new Chart(document.getElementById('oilPriceChart').getContext('2d'), {
         type: 'line',
         data: oilPriceData,
         options: {
@@ -262,6 +295,11 @@ window.onload = function() {
                 legend: {
                     display: true,
                     labels: { color: '#8b949e', font: { size: 11 }, boxWidth: 20 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` ${ctx.dataset.label}: $${ctx.parsed.y}`
+                    }
                 }
             },
             scales: {
@@ -270,7 +308,6 @@ window.onload = function() {
             }
         }
     });
-    updateOilSubtitle();
 
     // SCFI Chart
     new Chart(document.getElementById('scfiChart').getContext('2d'), {
@@ -295,7 +332,7 @@ window.onload = function() {
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
-            indexAxis: 'y', // Horizontal bar chart
+            indexAxis: 'y',
             scales: {
                 x: { grid: gridConfig, title: { display: true, text: 'Tariff Rate (%)' }, max: 120 },
                 y: { grid: { display: false } }
@@ -303,6 +340,10 @@ window.onload = function() {
         }
     });
 
-    // Fetch dynamic exchange data immediately on load
+    // 실시간 데이터 fetch
     fetchRealExchangeRate();
+    fetchRealOilPrices();
+
+    // 30분마다 유가 자동 갱신 (페이지 리로드 없이)
+    setInterval(fetchRealOilPrices, 30 * 60 * 1000);
 };
