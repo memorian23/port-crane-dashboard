@@ -137,38 +137,6 @@ header{display:flex;justify-content:space-between;align-items:center;padding-bot
     <div class="news-card" id="news-geo"><span class="news-category tag-geo">Geopolitics</span><p style="font-size:.8rem;color:var(--muted);">로딩 중...</p></div>
     <div class="news-card" id="news-abroad"><span class="news-category tag-abroad">Abroad</span><p style="font-size:.8rem;color:var(--muted);">로딩 중...</p></div>
   </div>
-
-  <div class="charts-grid">
-
-    <div class="panel">
-      <div class="panel-head">
-        <div><div class="panel-title">💱 USD / KRW 환율</div><div class="panel-meta">Frankfurter API · 실시간</div></div>
-        <div class="panel-right">
-          <div class="panel-val" id="exchange-rate-subtitle">--</div>
-          <div class="panel-src"><a href="https://www.frankfurter.app" target="_blank">frankfurter.app</a></div>
-        </div>
-      </div>
-      <div class="chart-box"><canvas id="exchangeRateChart"></canvas></div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-head">
-        <div><div class="panel-title">🛢 국제 유가 — WTI · Brent · Dubai</div><div class="panel-meta">월평균 ($/bbl)</div></div>
-        <div class="panel-right">
-          <div class="panel-val" id="oil-price-subtitle">--</div>
-          <div class="panel-src"><a href="https://www.eia.gov" target="_blank">eia.gov</a></div>
-        </div>
-      </div>
-      <div class="chart-box"><canvas id="oilPriceChart"></canvas></div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-head">
-        <div><div class="panel-title">📦 SCFI 컨테이너 운임 지수 (1Y)</div><div class="panel-meta">Shanghai Containerized Freight Index</div></div>
-      </div>
-      <div class="chart-box"><canvas id="scfiChart"></canvas></div>
-    </div>
-
     <!-- TARIFF -->
     <div class="panel full-width">
       <div class="panel-head">
@@ -219,6 +187,36 @@ header{display:flex;justify-content:space-between;align-items:center;padding-bot
       </div>
     </div>
 
+  <div class="charts-grid">
+
+    <div class="panel">
+      <div class="panel-head">
+        <div><div class="panel-title">💱 USD / KRW 환율</div><div class="panel-meta">Frankfurter API · 실시간</div></div>
+        <div class="panel-right">
+          <div class="panel-val" id="exchange-rate-subtitle">--</div>
+          <div class="panel-src"><a href="https://www.frankfurter.app" target="_blank">frankfurter.app</a></div>
+        </div>
+      </div>
+      <div class="chart-box"><canvas id="exchangeRateChart"></canvas></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div><div class="panel-title">🛢 국제 유가 — WTI · Brent · Dubai</div><div class="panel-meta">월평균 ($/bbl)</div></div>
+        <div class="panel-right">
+          <div class="panel-val" id="oil-price-subtitle">--</div>
+          <div class="panel-src"><a href="https://www.eia.gov" target="_blank">eia.gov</a></div>
+        </div>
+      </div>
+      <div class="chart-box"><canvas id="oilPriceChart"></canvas></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div><div class="panel-title">📦 SCFI 컨테이너 운임 지수 (1Y)</div><div class="panel-meta">Shanghai Containerized Freight Index</div></div>
+      </div>
+      <div class="chart-box"><canvas id="scfiChart"></canvas></div>
+    </div>
     <!-- AI ANALYSIS -->
     <div class="ai-panel">
       <div class="ai-header">
